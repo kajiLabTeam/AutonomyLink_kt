@@ -19,6 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AutonomyLink_kt"
+rootProject.name = "elpis_sender"
 include(":app")
- 

@@ -1,4 +1,4 @@
-package net.qqey.autonomylink_kt
+package net.kajilab.elpis_sender
 
 import org.junit.Test
 
