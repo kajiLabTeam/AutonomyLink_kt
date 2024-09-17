@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "net.kajilab.elpis_sender"
+    namespace = "net.kajilab.elpissender"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "net.kajilab.elpis_sender"
+        applicationId = "net.kajilab.elpissender"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -66,4 +66,22 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // jetpack
+    implementation (libs.androidx.lifecycle.viewmodel.compose)
+
+    //ibeacon
+    implementation(libs.android.beacon.library)
+
+    //easyPermission
+    implementation(libs.easypermissions)
+
+    // Rxjava
+    implementation (libs.rxandroid)
+    implementation (libs.rxjava)
+
+    // http
+    implementation (libs.retrofit)
+    implementation (libs.logging.interceptor)
+    implementation (libs.converter.gson)
 }

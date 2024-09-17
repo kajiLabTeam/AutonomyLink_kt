@@ -1,4 +1,4 @@
-package net.kajilab.elpis_sender
+package net.kajilab.elpissender
 
 import org.junit.Test
 

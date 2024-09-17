@@ -1,6 +1,5 @@
-package net.kajilab.elpis_sender.ui.theme
+package net.kajilab.elpissender.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

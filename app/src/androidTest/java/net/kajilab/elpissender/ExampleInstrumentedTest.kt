@@ -1,4 +1,4 @@
-package net.kajilab.elpis_sender
+package net.kajilab.elpissender
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
