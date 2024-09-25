@@ -1,4 +1,4 @@
-package net.kajilab.elpissender.API
+package net.kajilab.elpissender.API.http
 
 import android.content.Context
 import net.kajilab.elpissender.R
@@ -22,8 +22,12 @@ class ApiResponse(val context: Context) {
             setLevel(HttpLoggingInterceptor.Level.BODY)
         }
 
+        val username = "user1"
+        val password = "password"
+
         val client = OkHttpClient.Builder()
             .addInterceptor(logging)
+            .addInterceptor(BasicAuthInterceptor(username, password))
             .build()
 
         // Retrofitのセットアップ

@@ -1,4 +1,4 @@
-package net.kajilab.elpissender.API
+package net.kajilab.elpissender.API.http
 
 import okhttp3.MultipartBody
 import okhttp3.ResponseBody

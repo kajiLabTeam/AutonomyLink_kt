@@ -8,7 +8,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.kajilab.elpissender.API.ApiResponse
+import net.kajilab.elpissender.API.http.ApiResponse
 import net.kajilab.elpissender.API.FileExplorerApi
 import net.kajilab.elpissender.Repository.BLERepository
 import net.kajilab.elpissender.Repository.SensingRepository
