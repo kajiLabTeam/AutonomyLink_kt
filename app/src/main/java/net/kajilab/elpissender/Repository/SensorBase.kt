@@ -11,7 +11,7 @@ import net.kajilab.elpissender.API.OtherFileStorageApi
 import java.io.File
 
 abstract class SensorBase(val context: Context): SensorEventListener {
-    private lateinit var sensorManager: SensorManager
+    private var sensorManager: SensorManager? = null
     private var PreSensor: Sensor? = null
     val queue: ArrayDeque<String> = ArrayDeque(listOf())
     var otherFileStorage: OtherFileStorageApi? = null
@@ -23,21 +23,21 @@ abstract class SensorBase(val context: Context): SensorEventListener {
 
     fun init() {
         sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        PreSensor = sensorManager.getDefaultSensor(sensorType)
+        PreSensor = sensorManager?.getDefaultSensor(sensorType)
     }
 
     open suspend fun start(filename: String, samplingFrequency:Double) {
         queue.clear()
         otherFileStorage = OtherFileStorageApi(context, "${filename}_${sensorName}", queue)
         otherFileStorage?.saveAtBatch()
-        sensorManager.registerListener(this, PreSensor, SensorManager.SENSOR_DELAY_UI)
+        sensorManager?.registerListener(this, PreSensor, SensorManager.SENSOR_DELAY_UI)
 
         this.samplingFrequency = samplingFrequency
     }
 
     open fun stop(): Single<File> {
         val sensingFile = otherFileStorage?.stop()
-        sensorManager.unregisterListener(this)
+        sensorManager?.unregisterListener(this)
 
         return if (sensingFile != null) {
             Single.just(sensingFile)

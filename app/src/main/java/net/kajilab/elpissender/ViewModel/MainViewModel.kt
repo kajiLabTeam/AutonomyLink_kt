@@ -68,6 +68,7 @@ class MainViewModel (application: Application): AndroidViewModel(application) {
             }
         )
         sensorStartFlag = false
+        targetSensors = mutableListOf() // センサーをリセット
     }
 
     fun timerStart(fileName:String,onStopped:() -> Unit){
