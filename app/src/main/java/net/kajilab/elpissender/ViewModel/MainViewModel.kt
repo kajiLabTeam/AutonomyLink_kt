@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.kajilab.elpissender.API.http.ApiResponse
 import net.kajilab.elpissender.API.FileExplorerApi
+import net.kajilab.elpissender.API.NotificationApi
 import net.kajilab.elpissender.Repository.BLERepository
 import net.kajilab.elpissender.Repository.SensingRepository
 import net.kajilab.elpissender.Repository.SensorBase
@@ -30,6 +31,7 @@ class MainViewModel (application: Application): AndroidViewModel(application) {
     var sensorStartFlag = false
 
     val fileExplorerApi = FileExplorerApi(context)
+    val notificationApi = NotificationApi()
 
 
 
@@ -41,7 +43,9 @@ class MainViewModel (application: Application): AndroidViewModel(application) {
     }
     fun getPermission(activity: Activity){
         sensorRepository.getPermission(activity)
+        notificationApi.getPermission(context,activity)
     }
+
     suspend fun start(fileName:String){
 
         val samplingFrequency = -1.0
