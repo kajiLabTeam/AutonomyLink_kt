@@ -1,6 +1,8 @@
 package net.kajilab.elpissender.Presenter.ui.view
 
 import android.app.Activity
+import android.content.Intent
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -33,6 +35,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.kajilab.elpissender.Presenter.ui.theme.EstimatingLocationUsingRadioWavesTheme
+import net.kajilab.elpissender.Service.SensingService
 import net.kajilab.elpissender.ViewModel.MainViewModel
 import java.io.File
 
@@ -110,6 +113,20 @@ fun MainView(viewModel: MainViewModel = androidx.lifecycle.viewmodel.compose.vie
                 }
             }) {
                 Text(text = "10秒間のタイマーです。")
+            }
+
+            Button(
+                onClick = {
+                    // TODO: ここで、通知と位置情報などのパーミッションチェックをしておくといい
+                    val serviceIntent = Intent(context, SensingService::class.java)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(serviceIntent)
+                    } else {
+                        context.startService(serviceIntent)
+                    }
+                }
+            ){
+                Text(text = "バックグラウンドで実行")
             }
 
             filePathList.forEach { filePath ->
