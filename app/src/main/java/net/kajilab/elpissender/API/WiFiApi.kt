@@ -12,6 +12,8 @@ import android.net.wifi.WifiManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import pub.devrel.easypermissions.EasyPermissions
 
 class WiFiApi {
@@ -43,9 +45,14 @@ class WiFiApi {
         }
     }
 
-    fun scanWiFi(context: Context){
-        val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as android.net.wifi.WifiManager
-        wifiManager.startScan()
+    suspend fun scanWiFi(context: Context){
+        withContext(Dispatchers.IO) {
+            // WiFiスキャンの非同期処理を実装
+            // 例えば、WiFiManagerを使用してスキャンを実行する
+            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            wifiManager.startScan()
+            // スキャン結果を取得する処理を追加
+        }
     }
 
     fun getScanResults(context: Context , resultFunction:(MutableList<ScanResult>) -> Unit) {

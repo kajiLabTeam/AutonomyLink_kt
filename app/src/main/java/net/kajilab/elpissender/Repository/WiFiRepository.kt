@@ -2,8 +2,10 @@ package net.kajilab.elpissender.Repository
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import net.kajilab.elpissender.API.WiFiApi
@@ -46,9 +48,9 @@ class WiFiRepository(context: Context) : SensorBase(context) {
         isScanning = true
 
         // 以下の処理を止めるまで繰り返す
-        while(isScanning){
-            withContext(Dispatchers.Default){
-                wifiApi.scanWiFi(context)
+        withContext(Dispatchers.IO) {
+            while (isScanning) {
+                wifiApi.scanWiFi(context)  // 非同期に処理を行う
                 delay(scanInterval)
             }
         }

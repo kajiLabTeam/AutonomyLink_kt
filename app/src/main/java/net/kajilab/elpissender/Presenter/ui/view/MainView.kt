@@ -104,6 +104,7 @@ fun MainView(viewModel: MainViewModel = androidx.lifecycle.viewmodel.compose.vie
 
             Button(onClick = {
                 // CoroutineScopeを作成
+                viewModel.addSensor(lifecycleOwner)
                 isLoading.value = true
                 CoroutineScope(Dispatchers.Main).launch {
                     viewModel.timerStart("pixel4") {

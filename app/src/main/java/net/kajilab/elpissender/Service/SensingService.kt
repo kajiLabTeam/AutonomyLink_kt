@@ -7,6 +7,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
@@ -15,16 +16,20 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.PermissionChecker
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.kajilab.elpissender.API.FileExplorerApi
 import net.kajilab.elpissender.API.http.ApiResponse
 import net.kajilab.elpissender.R
+import net.kajilab.elpissender.Repository.BLERepository
 import net.kajilab.elpissender.Repository.SensingRepository
 import net.kajilab.elpissender.Repository.SensorBase
+import net.kajilab.elpissender.Repository.WiFiRepository
 import java.io.File
 
 class SensingService: Service() {
@@ -102,12 +107,14 @@ class SensingService: Service() {
 
         val samplingFrequency = -1.0
 
-        sensorRepository.sensorStart(
-            fileName = fileName,
-            sensors = targetSensors,
-            samplingFrequency = samplingFrequency
-        )
-        sensorStartFlag = true
+        withContext(Dispatchers.Default) {
+            sensorRepository.sensorStart(
+                fileName = fileName,
+                sensors = targetSensors,
+                samplingFrequency = samplingFrequency
+            )
+            sensorStartFlag = true
+        }
     }
 
     fun stop(onStopped:() -> Unit){
@@ -139,5 +146,12 @@ class SensingService: Service() {
                 delay(10 * 60 * 1000)
             }
         }
+    }
+
+    fun addSensor(lifecycleOwner: LifecycleOwner , context: Context){
+        val bleRepository = BLERepository(context)
+        bleRepository.lifecycleOwner = lifecycleOwner
+        targetSensors.add(bleRepository)
+        targetSensors.add(WiFiRepository(context))
     }
 }

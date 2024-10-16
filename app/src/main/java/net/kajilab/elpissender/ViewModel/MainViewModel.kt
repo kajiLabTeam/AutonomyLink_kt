@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.kajilab.elpissender.API.http.ApiResponse
@@ -46,16 +47,18 @@ class MainViewModel (application: Application): AndroidViewModel(application) {
         notificationApi.getPermission(context,activity)
     }
 
-    suspend fun start(fileName:String){
+    fun start(fileName:String){
+
 
         val samplingFrequency = -1.0
-
-        sensorRepository.sensorStart(
-            fileName = fileName,
-            sensors = targetSensors,
-            samplingFrequency = samplingFrequency
-        )
-        sensorStartFlag = true
+        viewModelScope.launch {
+            sensorRepository.sensorStart(
+                fileName = fileName,
+                sensors = targetSensors,
+                samplingFrequency = samplingFrequency
+            )
+            sensorStartFlag = true
+        }
     }
 
     fun stop(onStopped:() -> Unit){
@@ -75,15 +78,13 @@ class MainViewModel (application: Application): AndroidViewModel(application) {
         targetSensors = mutableListOf() // センサーをリセット
     }
 
-    fun timerStart(fileName:String,onStopped:() -> Unit){
-        viewModelScope.launch {
-            start(fileName)
-            Log.d("Timer", "タイマー開始")
-            delay(10000)
-            Log.d("Timer", "タイマー終了")
-            stop(onStopped)
-            onStopped()
-        }
+    suspend fun timerStart(fileName:String,onStopped:() -> Unit){
+        start(fileName)
+        Log.d("Timer", "タイマー開始")
+        delay(10000)
+        Log.d("Timer", "タイマー終了")
+        stop(onStopped)
+        onStopped()
     }
 
     fun scanFile() : List<File>{
