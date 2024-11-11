@@ -36,13 +36,17 @@ import java.io.File
 
 class SensingService: Service() {
 
+    var scanFlag = false
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        scanFlag = true
         startForeground()
         sensing()
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onDestroy() {
+        scanFlag = false
         if(targetSensors.isNotEmpty()){
             stop{
                 Log.d("SensingService","バックグラウンドで実行を止めたよ")
@@ -115,19 +119,19 @@ class SensingService: Service() {
     var sensorStartFlag = false
     private val serviceScope = CoroutineScope(Dispatchers.IO)
 
-    suspend fun start(fileName:String){
-        addSensor(
-            context = this
-        )
+    fun start(fileName:String){
+
+        addSensor(context = this)
 
         val samplingFrequency = -1.0
-
-        sensorRepository.sensorStart(
-            fileName = fileName,
-            sensors = targetSensors,
-            samplingFrequency = samplingFrequency
-        )
-        sensorStartFlag = true
+        serviceScope.launch {
+            sensorRepository.sensorStart(
+                fileName = fileName,
+                sensors = targetSensors,
+                samplingFrequency = samplingFrequency
+            )
+            sensorStartFlag = true
+        }
     }
 
     fun stop(onStopped:() -> Unit){
@@ -149,14 +153,16 @@ class SensingService: Service() {
 
     fun timerStart(fileName:String,onStopped:() -> Unit){
         serviceScope.launch {
-            while(true){
+            while(scanFlag){
                 start(fileName)
                 Log.d("Timer", "タイマー開始")
-                delay(10000)
+                delay(30 * 1000)
                 Log.d("Timer", "タイマー終了")
-                stop(onStopped)
-                onStopped()
-                delay(10 * 60 * 1000)
+                if(targetSensors.isNotEmpty()){
+                    stop(onStopped)
+                    onStopped()
+                }
+                delay( 60 * 1000)
             }
         }
     }
