@@ -89,7 +89,7 @@ class BLEApi {
 
             val mUuid = UUID.fromString("0000fe9f-0000-1000-8000-00805f9b34fb") // ビーコン
             val filter = ScanFilter.Builder()
-                .setServiceUuid(ParcelUuid(mUuid))
+                .setServiceUuid(null)
                 .build()
             scanFilters.add(filter)
 
