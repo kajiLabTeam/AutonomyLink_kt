@@ -34,14 +34,12 @@ class MainViewModel (application: Application): AndroidViewModel(application) {
     val fileExplorerApi = FileExplorerApi(context)
     val notificationApi = NotificationApi()
 
-
-
-    fun addSensor(lifecycleOwner: LifecycleOwner){
+    fun addSensor(){
         val bleRepository = BLERepository(context)
-        bleRepository.lifecycleOwner = lifecycleOwner
         targetSensors.add(bleRepository)
         targetSensors.add(WiFiRepository(context))
     }
+
     fun getPermission(activity: Activity){
         sensorRepository.getPermission(activity)
         notificationApi.getPermission(context,activity)

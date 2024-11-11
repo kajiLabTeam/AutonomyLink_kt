@@ -16,8 +16,6 @@ class BLERepository(context: Context): SensorBase(context) {
     override val sensorType: Int = SensorExtension.TYPE_BLEBEACON
     override val sensorName: String = "BLEBeacon"
 
-    var lifecycleOwner: LifecycleOwner? = null
-
     val TAG: String = "BLERepository"
 
     val bleApi = BLEApi()
@@ -29,14 +27,16 @@ class BLERepository(context: Context): SensorBase(context) {
     override suspend fun start(filename: String, samplingFrequency: Double) {
         super.start(filename, samplingFrequency)
 
-        if (lifecycleOwner != null) {
-            bleApi.startBLEBeaconScan(context, lifecycleOwner!!){ beacons: Collection<Beacon> ->
-                //ここにビーコンの情報を受け取る処理を書く
-                val time = DateUtils.getTimeStamp()
+        bleApi.startBLEBeaconScan(context){ beacons ->
+            //ここにビーコンの情報を受け取る処理を書く
+            val time = DateUtils.getTimeStamp()
+            val uuids = beacons?.scanRecord?.serviceUuids
+            val rssi = beacons?.rssi
+            val mac = beacons?.device?.address // 一旦macアドレスは送らない設定
 
-                for(beacon in beacons){
-                    val uuid = beacon.id1
-                    val rssi = beacon.rssi
+            if(uuids != null) {
+                for(uuid in uuids){
+                    val uuid = uuid.uuid.toString()
 
                     val data = "$time , $uuid , $rssi"
                     addQueue(
@@ -46,6 +46,7 @@ class BLERepository(context: Context): SensorBase(context) {
                     )
                 }
             }
+
         }
     }
 

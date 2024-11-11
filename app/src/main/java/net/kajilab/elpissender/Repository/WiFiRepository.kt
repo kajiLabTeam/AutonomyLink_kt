@@ -57,6 +57,7 @@ class WiFiRepository(context: Context) : SensorBase(context) {
     }
 
     override fun stop(): Single<File> {
+        wifiApi.stop(context)
         isScanning = false
         return super.stop()
     }

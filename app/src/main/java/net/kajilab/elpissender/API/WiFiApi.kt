@@ -23,6 +23,8 @@ class WiFiApi {
     //パーミッション確認用のコード
     private val PERMISSION_REQUEST_CODE = 2
 
+    var wifiScanReceiver:BroadcastReceiver? = null
+
     val permissions = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
         arrayOf(
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -58,7 +60,7 @@ class WiFiApi {
     fun getScanResults(context: Context , resultFunction:(MutableList<ScanResult>) -> Unit) {
         val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
-        val wifiScanReceiver = object : BroadcastReceiver() {
+        wifiScanReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false)
                 Log.d(TAG + "_WiFi","なんか受信はしたっぽい")
@@ -77,5 +79,9 @@ class WiFiApi {
         val intentFilter = IntentFilter()
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
         context.registerReceiver(wifiScanReceiver, intentFilter)
+    }
+
+    fun stop(context: Context){
+        context.unregisterReceiver(wifiScanReceiver)
     }
 }

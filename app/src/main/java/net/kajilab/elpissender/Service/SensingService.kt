@@ -12,9 +12,11 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
@@ -33,14 +35,24 @@ import net.kajilab.elpissender.Repository.WiFiRepository
 import java.io.File
 
 class SensingService: Service() {
-    override fun onBind(intent: Intent?): IBinder? {
-        throw UnsupportedOperationException("Not yet implemented")
-    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground()
         sensing()
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    override fun onDestroy() {
+        if(targetSensors.isNotEmpty()){
+            stop{
+                Log.d("SensingService","バックグラウンドで実行を止めたよ")
+            }
+        }
+        super.onDestroy()
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
     }
 
     private fun sensing(){
@@ -104,17 +116,18 @@ class SensingService: Service() {
     private val serviceScope = CoroutineScope(Dispatchers.IO)
 
     suspend fun start(fileName:String){
+        addSensor(
+            context = this
+        )
 
         val samplingFrequency = -1.0
 
-        withContext(Dispatchers.Default) {
-            sensorRepository.sensorStart(
-                fileName = fileName,
-                sensors = targetSensors,
-                samplingFrequency = samplingFrequency
-            )
-            sensorStartFlag = true
-        }
+        sensorRepository.sensorStart(
+            fileName = fileName,
+            sensors = targetSensors,
+            samplingFrequency = samplingFrequency
+        )
+        sensorStartFlag = true
     }
 
     fun stop(onStopped:() -> Unit){
@@ -148,10 +161,8 @@ class SensingService: Service() {
         }
     }
 
-    fun addSensor(lifecycleOwner: LifecycleOwner , context: Context){
-        val bleRepository = BLERepository(context)
-        bleRepository.lifecycleOwner = lifecycleOwner
-        targetSensors.add(bleRepository)
+    fun addSensor(context: Context){
+        targetSensors.add(BLERepository(context))
         targetSensors.add(WiFiRepository(context))
     }
 }

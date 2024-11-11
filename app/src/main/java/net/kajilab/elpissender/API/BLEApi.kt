@@ -1,9 +1,22 @@
 package net.kajilab.elpissender.API
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.le.BluetoothLeScanner
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
+import android.bluetooth.le.ScanRecord
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
+import android.content.Context.POWER_SERVICE
 import android.os.Build
+import android.os.ParcelUuid
+import android.os.PowerManager
+import android.util.Log
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import org.altbeacon.beacon.Beacon
@@ -11,19 +24,17 @@ import org.altbeacon.beacon.BeaconManager
 import org.altbeacon.beacon.BeaconParser
 import org.altbeacon.beacon.Region
 import pub.devrel.easypermissions.EasyPermissions
+import java.util.UUID
 
 class BLEApi {
 
-    // iBeaconのデータを認識するためのParserフォーマット
-    val IBEACON_FORMAT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"
     //パーミッション確認用のコード
     private val PERMISSION_REQUEST_CODE = 1
-    //出力結果を保存する場所
-    var outputText = ""
 
-    // beaconManager
-    var beaconManager: BeaconManager? = null
+    private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
+    private val bluetoothLeScanner: BluetoothLeScanner? = bluetoothAdapter?.bluetoothLeScanner
 
+    var leScanCallback: ScanCallback? = null
 
     val permissions = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
         arrayOf(
@@ -48,25 +59,46 @@ class BLEApi {
         }
     }
 
-    fun startBLEBeaconScan(context: Context, lifecycleOwner: LifecycleOwner , rangingObserver:Observer<Collection<Beacon>>){
+    @SuppressLint("MissingPermission")
+    fun startBLEBeaconScan(context: Context,resultBeacon:(ScanResult?)->Unit){
         //パーミッションが許可された時にIbeaconが動く
-        if(EasyPermissions.hasPermissions(context, *permissions)){
-            //絞り込みをする部分
-            //今回nullなので、全てを取得する。
-            //id1:uuid id2:major id3:minor
-            val mRegion = Region("unique-id-001", null, null, null)
 
-            beaconManager = BeaconManager.getInstanceForApplication(context)
-            // Set up a Live Data observer so this Activity can get ranging callbacks
-            // observer will be called each time the monitored regionState changes (inside vs. outside region)
-            beaconManager?.getRegionViewModel(mRegion)?.rangedBeacons?.observe(lifecycleOwner, rangingObserver)
-            beaconManager?.beaconParsers?.add(BeaconParser().setBeaconLayout(IBEACON_FORMAT))
-            beaconManager?.startRangingBeacons(mRegion)
+        leScanCallback = object : ScanCallback() {
+            override fun onScanResult(callbackType: Int, result: ScanResult) {
+                //nameをログで出力する。nullだった場合No Name
+                //Log.d("scanResult", result.device.toString() ?: "No Name")
+                val uuids = result.scanRecord?.serviceUuids
+                var uuidString = ""
+                if(uuids != null){
+                    for(uuid in uuids) {
+                        uuidString += uuid.toString() + ","
+                    }
+                }
+                Log.d("scanResult", result.device.address + " , " + uuidString + " , " + result.rssi)
+                resultBeacon(result)
+            }
+        }
+
+        if(EasyPermissions.hasPermissions(context, *permissions)){
+
+            // スキャンのセッティング
+            val scanSettings = ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)  // foreground serviceでやろうとするとこのスキャンモードが強制。
+                .build()
+            val scanFilters = mutableListOf<ScanFilter>()
+
+            val mUuid = UUID.fromString("0000fe9f-0000-1000-8000-00805f9b34fb") // ビーコン
+            val filter = ScanFilter.Builder()
+                .setServiceUuid(ParcelUuid(mUuid))
+                .build()
+            scanFilters.add(filter)
+
+            bluetoothLeScanner?.startScan(scanFilters, scanSettings, leScanCallback)
         }
     }
 
+    @SuppressLint("MissingPermission")
     fun stopBLEBeaconScan(){
-        val mRegion = Region("unique-id-001", null, null, null)
-        beaconManager?.stopRangingBeacons(mRegion)
+        bluetoothLeScanner?.stopScan(leScanCallback)
     }
 }

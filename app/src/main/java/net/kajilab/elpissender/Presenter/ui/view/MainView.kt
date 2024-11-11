@@ -46,7 +46,6 @@ fun MainView(viewModel: MainViewModel = androidx.lifecycle.viewmodel.compose.vie
 
     val context = LocalContext.current
     val activity: Activity = LocalContext.current as Activity
-    val lifecycleOwner = LocalLifecycleOwner.current
     var filePathList = remember { mutableStateListOf<File>() }
     val isLoading = remember { mutableStateOf(false) }
 
@@ -73,7 +72,7 @@ fun MainView(viewModel: MainViewModel = androidx.lifecycle.viewmodel.compose.vie
         ){
             Button(onClick = {
                 // CoroutineScopeを作成
-                viewModel.addSensor(lifecycleOwner)
+                viewModel.addSensor()
                 CoroutineScope(Dispatchers.Main).launch {
                     viewModel.start("pixel4")
                 }
@@ -104,7 +103,7 @@ fun MainView(viewModel: MainViewModel = androidx.lifecycle.viewmodel.compose.vie
 
             Button(onClick = {
                 // CoroutineScopeを作成
-                viewModel.addSensor(lifecycleOwner)
+                viewModel.addSensor()
                 isLoading.value = true
                 CoroutineScope(Dispatchers.Main).launch {
                     viewModel.timerStart("pixel4") {
@@ -128,6 +127,15 @@ fun MainView(viewModel: MainViewModel = androidx.lifecycle.viewmodel.compose.vie
                 }
             ){
                 Text(text = "バックグラウンドで実行")
+            }
+
+            Button(
+                onClick = {
+                    val serviceIntent = Intent(context, SensingService::class.java)
+                    context.stopService(serviceIntent)
+                }
+            ){
+                Text(text = "バックグラウンドで実行を止める")
             }
 
             filePathList.forEach { filePath ->
