@@ -156,13 +156,13 @@ class SensingService: Service() {
             while(scanFlag){
                 start(fileName)
                 Log.d("Timer", "タイマー開始")
-                delay(30 * 1000)
+                delay(2 * 60 * 1000)
                 Log.d("Timer", "タイマー終了")
                 if(targetSensors.isNotEmpty()){
                     stop(onStopped)
                     onStopped()
                 }
-                delay( 60 * 1000)
+                delay(    1 * 60 * 1000)
             }
         }
     }
