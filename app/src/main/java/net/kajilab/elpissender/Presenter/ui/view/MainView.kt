@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import net.kajilab.elpissender.Presenter.ui.view.Components.BottomNavigationBar
@@ -59,7 +60,10 @@ fun MainView() {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = topBarTitle)
+                    Text(
+                        text = topBarTitle,
+                        fontWeight = FontWeight.Bold,
+                    )
                 },
                 actions = {
                     topAppBarActions.forEach {
