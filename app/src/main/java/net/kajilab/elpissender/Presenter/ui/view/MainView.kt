@@ -92,6 +92,9 @@ fun MainView() {
             topAppBarActions = {
                 topAppBarActions = it
             },
+            toSettingScreen = {
+                navController.navigate(BottomNavigationBarRoute.SETTING.route)
+            },
             modifier = Modifier
                 .padding(innerPadding)
         )

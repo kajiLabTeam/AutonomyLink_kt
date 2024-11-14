@@ -1,6 +1,11 @@
 package net.kajilab.elpissender.Presenter.ui.view
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -16,7 +21,8 @@ fun MainRouter(
     changeTopBarTitle: (String) -> Unit,
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    topAppBarActions: ( List<@Composable () -> Unit>) -> Unit
+    topAppBarActions: ( List<@Composable () -> Unit>) -> Unit,
+    toSettingScreen: () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -32,7 +38,13 @@ fun MainRouter(
         composable(BottomNavigationBarRoute.USER.route) {
             UserScreen()
             topAppBarActions(
-                listOf()
+                listOf{
+                    IconButton(onClick = {
+                        toSettingScreen()
+                    }) {
+                        Icon(Icons.Filled.Settings, "Setting")
+                    }
+                }
             )
             changeTopBarTitle(BottomNavigationBarRoute.USER.title)
         }
