@@ -1,8 +1,6 @@
 package net.kajilab.elpissender.Presenter.ui.view.Setting
 
-import android.content.res.Resources.Theme
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,13 +14,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -182,6 +179,12 @@ fun SettingScreen() {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewSettingScreen() {
+    SettingScreen()
+}
+
 @Composable
 fun SettingSectionTitle(title: String, content: @Composable () -> Unit = {}) {
     Column {
@@ -193,10 +196,20 @@ fun SettingSectionTitle(title: String, content: @Composable () -> Unit = {}) {
             modifier = Modifier
                 .padding(vertical = 8.dp)
         )
-
         content()
     }
+}
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewSettingSectionTitle() {
+    SettingSectionTitle(title = "センシング設定"){
+        SettingNavigationItem(
+            title = "センシング時間と待機時間",
+            description = "センシング中の時間: 10 分, 待機時間: 5 分",
+            onClick = {}
+        )
+    }
 }
 
 @Composable
@@ -228,6 +241,18 @@ fun SettingSwitchItem(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewSettingSwitchItem() {
+    SettingSwitchItem(
+        title = "BLEとWi-Fiを取得する",
+        description = "BLEとWi-Fiを取得し、送信します。止めるまで送信はされません。",
+        checked = false,
+        onCheckedChange = {},
+    )
+}
+
+
 @Composable
 fun SettingNavigationItem(
     title: String,
@@ -253,6 +278,16 @@ fun SettingNavigationItem(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewSettingNavigationItem() {
+    SettingNavigationItem(
+        title = "センシング時間と待機時間",
+        description = "センシング中の時間: 10 分, 待機時間: 5 分",
+        onClick = {}
+    )
+}
+
 @Composable
 fun SettingItem(
     title: String,
@@ -272,6 +307,17 @@ fun SettingItem(
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewSettingItem() {
+    SettingItem(
+        title = "センシング時間と待機時間",
+        description = "センシング中の時間: 10 分, 待機時間: 5 分",
+        onClick = {}
+    )
+}
+
 
 @Composable
 fun UrlInputDialog(
@@ -314,6 +360,17 @@ fun UrlInputDialog(
     )
 }
 
+@Preview
+@Composable
+fun PreviewUrlInputDialog() {
+    UrlInputDialog(
+        title = "URLを入力",
+        description = "URLを入力してください",
+        initialValue = "https://example.com",
+        onDismiss = {},
+        onSave = {}
+    )
+}
 
 @Composable
 fun TimeIntervalInputDialog(
@@ -367,5 +424,18 @@ fun TimeIntervalInputDialog(
                 Text("キャンセル")
             }
         }
+    )
+}
+
+@Preview
+@Composable
+fun PreviewTimeIntervalInputDialog() {
+    TimeIntervalInputDialog(
+        title = "センシング設定",
+        description = "センシング中の時間と待機時間を設定してください",
+        initialSensingTime = 10,
+        initialWaitTime = 5,
+        onDismiss = {},
+        onSave = { _, _ -> }
     )
 }
