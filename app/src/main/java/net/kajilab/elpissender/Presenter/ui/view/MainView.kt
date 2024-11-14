@@ -13,13 +13,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,167 +37,80 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.kajilab.elpissender.Presenter.ui.theme.EstimatingLocationUsingRadioWavesTheme
+import net.kajilab.elpissender.Presenter.ui.view.Components.BottomNavigationBar
+import net.kajilab.elpissender.R
 import net.kajilab.elpissender.Service.SensingService
 import net.kajilab.elpissender.ViewModel.MainViewModel
+import net.kajilab.elpissender.entity.BottomNavigationBarRoute
+import net.kajilab.elpissender.entity.BottomNavigationItem
 import java.io.File
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainView(viewModel: MainViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
-
-    val TAG = "MainView"
-
-    val context = LocalContext.current
-    val activity: Activity = LocalContext.current as Activity
-    var filePathList = remember { mutableStateListOf<File>() }
-    val isLoading = remember { mutableStateOf(false) }
-
-    var bleFile by remember { mutableStateOf<File?>(null) }
-    var wifiFile by remember { mutableStateOf<File?>(null) }
-
-    // 最初にFileScanを行う
-    LaunchedEffect(isLoading){
-        filePathList.clear()
-        filePathList.addAll(viewModel.scanFile())
+fun MainView() {
+    var selectedItemIndex by remember { mutableIntStateOf(0) }
+    val navController = rememberNavController()
+    var topBarTitle by remember {
+        mutableStateOf("TrainAlert2")
     }
 
-    LaunchedEffect(Unit){
-        filePathList.clear()
-        filePathList.addAll(viewModel.scanFile())
-    }
+    val bottomNavigationItems = listOf(
+        BottomNavigationItem(
+            title = stringResource(id = R.string.home),
+            selectedIcon = Icons.Filled.Home,
+            unselectedIcon = Icons.Filled.Home,
+            hasNews = false,
+            badgeCount = null,
+            path = BottomNavigationBarRoute.HOME
+        ),
+        BottomNavigationItem(
+            title = stringResource(id = R.string.user),
+            selectedIcon = Icons.Filled.AccountCircle,
+            unselectedIcon = Icons.Filled.AccountCircle,
+            hasNews = false,
+            badgeCount = null,
+            path = BottomNavigationBarRoute.USER
+        )
+    )
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier.verticalScroll(rememberScrollState())
-        ){
-            Button(onClick = {
-                // CoroutineScopeを作成
-                viewModel.addSensor()
-                CoroutineScope(Dispatchers.Main).launch {
-                    viewModel.start("pixel4")
-                }
-                isLoading.value = true
-            }) {
-                Text(text = "Start")
-            }
-
-            Button(onClick = {
-                // CoroutineScopeを作成
-                CoroutineScope(Dispatchers.Main).launch {
-                    viewModel.getPermission(activity)
-                }
-            }) {
-                Text(text = "Permission")
-            }
-
-            Button(onClick = {
-                // CoroutineScopeを作成
-                CoroutineScope(Dispatchers.Main).launch {
-                    viewModel.stop {
-                        isLoading.value = false
-                    }
-                }
-            }) {
-                Text(text = "Stop")
-            }
-
-            Button(onClick = {
-                // CoroutineScopeを作成
-                viewModel.addSensor()
-                isLoading.value = true
-                CoroutineScope(Dispatchers.Main).launch {
-                    viewModel.timerStart("pixel4") {
-                        // stopの処理
-                        isLoading.value = false
-                    }
-                }
-            }) {
-                Text(text = "10秒間のタイマーです。")
-            }
-
-            Button(
-                onClick = {
-                    // TODO: ここで、通知と位置情報などのパーミッションチェックをしておくといい
-                    val serviceIntent = Intent(context, SensingService::class.java)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        context.startForegroundService(serviceIntent)
-                    } else {
-                        context.startService(serviceIntent)
-                    }
-                }
+    Scaffold(
+        topBar = {
+            TopAppBar(title = {
+                Text(text = topBarTitle)
+            })
+        },
+        bottomBar = {
+            val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+            if(
+                currentRoute == BottomNavigationBarRoute.HOME.route ||
+                currentRoute == BottomNavigationBarRoute.USER.route
             ){
-                Text(text = "バックグラウンドで実行")
-            }
-
-            Button(
-                onClick = {
-                    val serviceIntent = Intent(context, SensingService::class.java)
-                    context.stopService(serviceIntent)
+                BottomNavigationBar(
+                    items = bottomNavigationItems,
+                    selectedItemIndex = selectedItemIndex
+                ) { index ->
+                    selectedItemIndex = index
+                    navController.navigate(bottomNavigationItems[index].path.route)
                 }
-            ){
-                Text(text = "バックグラウンドで実行を止める")
-            }
-
-            filePathList.forEach { filePath ->
-                Text(
-                    text = filePath.name,
-                    modifier = Modifier
-                        .padding(all = 8.dp)
-                        .clickable {
-                            if (filePath.name.contains("BLE")) {
-                                bleFile = filePath
-                            } else if (filePath.name.contains("WiFi")) {
-                                wifiFile = filePath
-                            }
-                        }
-                )
-            }
-
-            Button(
-                onClick = {
-                    if (wifiFile != null && bleFile != null) {
-                        viewModel.postCsvData(wifiFile!!, bleFile!!)
-                    }
-                },
-                enabled = wifiFile != null && bleFile != null
-            ) {
-                Text(text = "送信する")
-            }
-            Text(text = "wifiFile: ${wifiFile?.name}")
-            Text(text = "bleFile: ${bleFile?.name}")
-        }
-
-        if(isLoading.value){
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.5f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .width(40.dp)
-                        .height(40.dp),
-                    color = MaterialTheme.colorScheme.secondary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    EstimatingLocationUsingRadioWavesTheme {
-        MainView()
+    ) { innerPadding ->
+        MainRouter(
+            changeTopBarTitle = { title ->
+                topBarTitle = title
+            },
+            navController = navController,
+            modifier = Modifier
+                .padding(innerPadding)
+        )
     }
 }
