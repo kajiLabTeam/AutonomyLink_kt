@@ -1,58 +1,27 @@
 package net.kajilab.elpissender.Presenter.ui.view
 
-import android.app.Activity
-import android.content.Intent
-import android.os.Build
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import net.kajilab.elpissender.Presenter.ui.theme.EstimatingLocationUsingRadioWavesTheme
 import net.kajilab.elpissender.Presenter.ui.view.Components.BottomNavigationBar
 import net.kajilab.elpissender.R
-import net.kajilab.elpissender.Service.SensingService
-import net.kajilab.elpissender.ViewModel.MainViewModel
 import net.kajilab.elpissender.entity.BottomNavigationBarRoute
 import net.kajilab.elpissender.entity.BottomNavigationItem
-import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,6 +30,10 @@ fun MainView() {
     val navController = rememberNavController()
     var topBarTitle by remember {
         mutableStateOf("TrainAlert2")
+    }
+
+    var topAppBarActions by remember {
+        mutableStateOf(listOf<@Composable () -> Unit>())
     }
 
     val bottomNavigationItems = listOf(
@@ -84,9 +57,16 @@ fun MainView() {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = {
-                Text(text = topBarTitle)
-            })
+            TopAppBar(
+                title = {
+                    Text(text = topBarTitle)
+                },
+                actions = {
+                    topAppBarActions.forEach {
+                        it()
+                    }
+                }
+            )
         },
         bottomBar = {
             val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
@@ -109,6 +89,9 @@ fun MainView() {
                 topBarTitle = title
             },
             navController = navController,
+            topAppBarActions = {
+                topAppBarActions = it
+            },
             modifier = Modifier
                 .padding(innerPadding)
         )

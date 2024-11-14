@@ -13,9 +13,10 @@ import net.kajilab.elpissender.entity.BottomNavigationBarRoute
 
 @Composable
 fun MainRouter(
-    changeTopBarTitle:(String) -> Unit,
+    changeTopBarTitle: (String) -> Unit,
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    topAppBarActions: ( List<@Composable () -> Unit>) -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -23,15 +24,23 @@ fun MainRouter(
         modifier = modifier.fillMaxSize()
     ) {
         composable(BottomNavigationBarRoute.HOME.route) {
-            HomeScreen()
+            HomeScreen(
+                topAppBarActions = topAppBarActions
+            )
             changeTopBarTitle(BottomNavigationBarRoute.HOME.title)
         }
         composable(BottomNavigationBarRoute.USER.route) {
             UserScreen()
+            topAppBarActions(
+                listOf()
+            )
             changeTopBarTitle(BottomNavigationBarRoute.USER.title)
         }
         composable(BottomNavigationBarRoute.SETTING.route) {
             SettingScreen()
+            topAppBarActions(
+                listOf()
+            )
             changeTopBarTitle(BottomNavigationBarRoute.SETTING.title)
         }
 
