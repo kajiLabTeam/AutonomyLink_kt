@@ -22,8 +22,8 @@ class ApiResponse(val context: Context) {
             setLevel(HttpLoggingInterceptor.Level.BODY)
         }
 
-        val username = "user1"
-        val password = "password"
+        val username = "harutiro"
+        val password = "password3"
 
         val client = OkHttpClient.Builder()
             .addInterceptor(logging)
