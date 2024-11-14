@@ -63,8 +63,8 @@ class WiFiApi {
         wifiScanReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false)
-                Log.d(TAG + "_WiFi","なんか受信はしたっぽい")
-                Log.d(TAG + "_WiFi",success.toString())
+//                Log.d(TAG + "_WiFi","なんか受信はしたっぽい")
+//                Log.d(TAG + "_WiFi",success.toString())
                 if (ActivityCompat.checkSelfPermission(
                         context,
                         Manifest.permission.ACCESS_FINE_LOCATION

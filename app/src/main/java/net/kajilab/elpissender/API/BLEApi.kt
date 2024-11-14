@@ -74,7 +74,7 @@ class BLEApi {
                         uuidString += uuid.toString() + ","
                     }
                 }
-                Log.d("scanResult", result.device.address + " , " + uuidString + " , " + result.rssi)
+//                Log.d("scanResult", result.device.address + " , " + uuidString + " , " + result.rssi)
                 resultBeacon(result)
             }
         }
