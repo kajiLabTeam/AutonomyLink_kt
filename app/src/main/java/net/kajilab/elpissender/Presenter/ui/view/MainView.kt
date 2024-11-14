@@ -2,9 +2,12 @@ package net.kajilab.elpissender.Presenter.ui.view
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -69,7 +72,23 @@ fun MainView() {
                     topAppBarActions.forEach {
                         it()
                     }
-                }
+                },
+                navigationIcon = {
+                    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+                    if(
+                        !(currentRoute == BottomNavigationBarRoute.HOME.route ||
+                        currentRoute == BottomNavigationBarRoute.USER.route)
+                    ){
+                        IconButton(onClick = {
+                            navController.popBackStack()
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Localized description"
+                            )
+                        }
+                    }
+                },
             )
         },
         bottomBar = {
