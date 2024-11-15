@@ -1,11 +1,17 @@
 package net.kajilab.elpissender.Presenter.ui.view.User
 
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import net.kajilab.elpissender.API.SearedPreferenceApi
+import net.kajilab.elpissender.Repository.UserRepository
+import net.kajilab.elpissender.Service.SensingService
+import net.kajilab.elpissender.entity.User
 
 class UserViewModel: ViewModel() {
 
@@ -14,52 +20,46 @@ class UserViewModel: ViewModel() {
     var serverUrl by mutableStateOf("")
     var isSensing by mutableStateOf(false)
 
+    val userRepository = UserRepository()
     val searedPreferenceApi = SearedPreferenceApi()
 
-    fun updateUserName(
-        name: String,
-        activity: Activity
-    ) {
-        searedPreferenceApi.setStringValueByKey("userName",name,activity)
+    fun saveUserSetting(context: Context){
+        userRepository.saveUserSetting(
+            userName,
+            password,
+            serverUrl,
+            context
+        )
     }
 
-    fun updatePassword(
-        password: String,
-        activity: Activity
-    ) {
-        searedPreferenceApi.setStringValueByKey("password",password,activity)
+    fun checkHealthyService(){
+
     }
 
-    fun updateServerUrl(
-        url: String,
-        activity: Activity
-    ) {
-        searedPreferenceApi.setStringValueByKey("serverUrl",url,activity)
+    fun getSensingStatus(context: Context): Boolean {
+        return searedPreferenceApi.getBooleanValueByKey("isSensing",context)
     }
 
-
-    fun getUserName(
-        activity: Activity
-    ): String {
-        return searedPreferenceApi.getStringValueByKey("userName",activity)
+    fun getUserSetting(context: Context): User {
+        return userRepository.getUserSetting(context)
     }
 
-    fun getPassword(
-        activity: Activity
-    ): String {
-        return searedPreferenceApi.getStringValueByKey("password",activity)
-    }
+    fun startForegroundSensing(
+        isSensing: Boolean,
+        context: Context
+    ){
+        if(isSensing){
+            // TODO: ここで、通知と位置情報などのパーミッションチェックをしておくといい
+            val serviceIntent = Intent(context, SensingService::class.java)
 
-    fun getServerUrl(
-        activity: Activity
-    ): String {
-        return searedPreferenceApi.getStringValueByKey("serverUrl",activity)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent)
+            } else {
+                context.startService(serviceIntent)
+            }
+        }else{
+            val serviceIntent = Intent(context, SensingService::class.java)
+            context.stopService(serviceIntent)
+        }
     }
-
-    fun saveUserSetting(activity: Activity){
-        updateUserName(userName,activity)
-        updatePassword(password,activity)
-        updateServerUrl(serverUrl,activity)
-    }
-
 }

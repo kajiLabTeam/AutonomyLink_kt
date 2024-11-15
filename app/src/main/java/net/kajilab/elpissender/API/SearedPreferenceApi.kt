@@ -9,10 +9,10 @@ class SearedPreferenceApi {
 
     fun getStringValueByKey(
         key: String,
-        activity: Activity
+        context: Context
     ): String {
 
-        val sharedPref = activity.getSharedPreferences(
+        val sharedPref = context.getSharedPreferences(
             preference_file_key,
             Context.MODE_PRIVATE
         )
@@ -23,9 +23,9 @@ class SearedPreferenceApi {
     fun setStringValueByKey(
         key: String,
         value: String,
-        activity: Activity
+        context: Context
     ) {
-        val sharedPref = activity.getSharedPreferences(
+        val sharedPref = context.getSharedPreferences(
             preference_file_key,
             Context.MODE_PRIVATE
         )
@@ -38,9 +38,9 @@ class SearedPreferenceApi {
 
     fun getIntegerValueByKey(
         key: String,
-        activity: Activity
+        context: Context
     ): Int {
-        val sharedPref = activity.getSharedPreferences(
+        val sharedPref = context.getSharedPreferences(
             preference_file_key,
             Context.MODE_PRIVATE
         )
@@ -51,15 +51,43 @@ class SearedPreferenceApi {
     fun setIntegerValueByKey(
         key: String,
         value: Int,
-        activity: Activity
+        context: Context
     ) {
-        val sharedPref = activity.getSharedPreferences(
+        val sharedPref = context.getSharedPreferences(
             preference_file_key,
             Context.MODE_PRIVATE
         )
 
         with(sharedPref.edit()) {
             putInt(key, value)
+            apply()
+        }
+    }
+
+    fun getBooleanValueByKey(
+        key: String,
+        context: Context
+    ):Boolean {
+        val sharedPref = context.getSharedPreferences(
+            preference_file_key,
+            Context.MODE_PRIVATE
+        )
+
+        return sharedPref.getBoolean(key, false)
+    }
+
+    fun setBooleanValueByKey(
+        key: String,
+        value: Boolean,
+        context: Context
+    ){
+        val sharedPref = context.getSharedPreferences(
+            preference_file_key,
+            Context.MODE_PRIVATE
+        )
+
+        with(sharedPref.edit()) {
+            putBoolean(key, value)
             apply()
         }
     }

@@ -41,9 +41,13 @@ fun UserScreen(
     val activity = LocalContext.current as Activity
 
     LaunchedEffect(Unit){
-        viewModel.userName = viewModel.getUserName(activity)
-        viewModel.password = viewModel.getPassword(activity)
-        viewModel.serverUrl = viewModel.getServerUrl(activity)
+        val isSensing = viewModel.getSensingStatus(activity)
+        viewModel.isSensing = isSensing
+
+        val user = viewModel.getUserSetting(activity)
+        viewModel.userName = user.userName
+        viewModel.password = user.password
+        viewModel.serverUrl = user.serverUrl
     }
 
     Column(
@@ -75,11 +79,10 @@ fun UserScreen(
                 checked = viewModel.isSensing,
                 onCheckedChange = { isChecked ->
                     viewModel.isSensing = isChecked
-                    if (isChecked) {
-                        Log.d("UserScreen", "スイッチがONになりました")
-                    } else {
-                        Log.d("UserScreen", "スイッチがOFFになりました")
-                    }
+                    viewModel.startForegroundSensing(
+                        isSensing = isChecked,
+                        context = activity,
+                    )
                 },
             )
         }

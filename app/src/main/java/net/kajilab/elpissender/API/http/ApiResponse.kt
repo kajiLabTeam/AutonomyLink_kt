@@ -16,14 +16,17 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 
 class ApiResponse(val context: Context) {
-    fun postCsvData(wifiFile: File, bleFile:File) {
+    fun postCsvData(
+        wifiFile: File,
+        bleFile:File,
+        username: String,
+        password: String,
+        url: String
+    ) {
         // OkHttpClientのセットアップ
         val logging = HttpLoggingInterceptor().apply {
             setLevel(HttpLoggingInterceptor.Level.BODY)
         }
-
-        val username = "harutiro"
-        val password = "password3"
 
         val client = OkHttpClient.Builder()
             .addInterceptor(logging)
@@ -32,7 +35,7 @@ class ApiResponse(val context: Context) {
 
         // Retrofitのセットアップ
         val retrofit = Retrofit.Builder()
-            .baseUrl(context.getString(R.string.base_url))
+            .baseUrl(url)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
