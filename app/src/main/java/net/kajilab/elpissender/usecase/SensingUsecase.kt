@@ -30,6 +30,7 @@ class SensingUsecase(
 ) {
     private val apiResponse = ApiResponse(context)
     private val sensorRepository = SensingRepository(context)
+    private val searedPreferenceApi = SearedPreferenceApi()
 
     private var scanFlag = false
     private var targetSensors: MutableList<SensorBase> = mutableListOf()
@@ -38,13 +39,24 @@ class SensingUsecase(
     private var user = User()
 
     fun firstStart(user: User){
+        val sensingTime = searedPreferenceApi.getIntegerValueByKey(
+            key = "sensingTime",
+            context = context
+        )
+        val waitTime = searedPreferenceApi.getIntegerValueByKey(
+            key = "waitTime",
+            context = context
+        )
+
         this.user = user
         scanFlag = true
         timerStart(
             fileName = "background",
             onStopped = {
                 Log.d("SensingService","BackGroundで一回実行されたよ")
-            }
+            },
+            sensingTime = sensingTime,
+            waitTime = waitTime
         )
     }
 
@@ -109,19 +121,21 @@ class SensingUsecase(
 
     private fun timerStart(
         fileName:String,
-        onStopped:() -> Unit
+        onStopped:() -> Unit,
+        sensingTime:Int,
+        waitTime:Int
     ){
         serviceScope.launch {
             while(scanFlag){
                 start(fileName)
                 Log.d("Timer", "タイマー開始")
-                delay(2 * 60 * 1000)
+                delay(sensingTime * 60 * 1000L)
                 Log.d("Timer", "タイマー終了")
                 if(targetSensors.isNotEmpty()){
                     stop(onStopped)
                     onStopped()
                 }
-                delay(    1 * 60 * 1000)
+                delay(    waitTime * 60 * 1000L)
             }
         }
     }
