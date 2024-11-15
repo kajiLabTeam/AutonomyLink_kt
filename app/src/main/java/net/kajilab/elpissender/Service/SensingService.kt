@@ -24,13 +24,6 @@ class SensingService: Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         searedPreferenceApi.setBooleanValueByKey("isSensing",true,this)
         val user = userRepository.getUserSetting(this)
-        if(user.userName == "" && user.password == "" && user.serverUrl == ""){
-            // toastを表示して、画面を閉じる
-            Log.d("SensingService","ユーザー情報が取得できませんでした")
-            Toast.makeText(this, "ユーザー情報が取得できませんでした", Toast.LENGTH_SHORT).show()
-            stopSelf()
-        }
-
         startForeground()
         sensingUsecase.firstStart(user)
         return super.onStartCommand(intent, flags, startId)

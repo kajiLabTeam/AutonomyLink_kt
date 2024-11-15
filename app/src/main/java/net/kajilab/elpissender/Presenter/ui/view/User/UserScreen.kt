@@ -38,13 +38,14 @@ fun UserScreen(
     viewModel: UserViewModel = viewModel(),
     showSnackbar: (String) -> Unit
 ) {
-    val activity = LocalContext.current as Activity
+
+    val context = LocalContext.current
 
     LaunchedEffect(Unit){
-        val isSensing = viewModel.getSensingStatus(activity)
+        val isSensing = viewModel.getSensingStatus(context = context)
         viewModel.isSensing = isSensing
 
-        val user = viewModel.getUserSetting(activity)
+        val user = viewModel.getUserSetting(context = context)
         viewModel.userName = user.userName
         viewModel.password = user.password
         viewModel.serverUrl = user.serverUrl
@@ -81,7 +82,7 @@ fun UserScreen(
                     viewModel.isSensing = isChecked
                     viewModel.startForegroundSensing(
                         isSensing = isChecked,
-                        context = activity,
+                        context = context,
                     )
                 },
             )
@@ -119,8 +120,10 @@ fun UserScreen(
 
         Button(
             onClick = {
-                viewModel.saveUserSetting(activity)
-                showSnackbar("保存しました")
+                viewModel.saveUserSetting(
+                    context = context,
+                    showSnackbar = showSnackbar
+                )
             },
             modifier = Modifier
                 .fillMaxWidth()
