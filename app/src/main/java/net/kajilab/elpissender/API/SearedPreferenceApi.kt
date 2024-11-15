@@ -38,6 +38,7 @@ class SearedPreferenceApi {
 
     fun getIntegerValueByKey(
         key: String,
+        defaultValue: Int = 0,
         context: Context
     ): Int {
         val sharedPref = context.getSharedPreferences(
@@ -45,7 +46,7 @@ class SearedPreferenceApi {
             Context.MODE_PRIVATE
         )
 
-        return sharedPref.getInt(key, 0)
+        return sharedPref.getInt(key, defaultValue)
     }
 
     fun setIntegerValueByKey(

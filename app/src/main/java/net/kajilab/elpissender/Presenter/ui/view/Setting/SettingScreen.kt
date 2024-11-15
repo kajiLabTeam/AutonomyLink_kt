@@ -22,6 +22,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,9 +43,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun SettingScreen(
     viewModel: SettingViewModel = viewModel()
 ) {
-    var isNegativeUrlDialogOpen by remember { mutableStateOf(false) }
-    var isPositiveUrlDialogOpen by remember { mutableStateOf(false) }
     var isSensingTimeDialogOpen by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit){
+        viewModel.getSetting(context)
+    }
 
     Column(
         modifier = Modifier
@@ -90,27 +96,10 @@ fun SettingScreen(
             )
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
 
-            // NegativeモデルURLの設定
-            SettingNavigationItem(
-                title = "Negativeモデル URLを設定",
-                description = "NegativeモデルのURLを設定するためにクリックしてください \n ${viewModel.negativeModelUrl}",
-                onClick = { isNegativeUrlDialogOpen = true }
-            )
-
-            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
-
             SettingItem(
                 title = "Positiveモデルを送信する",
                 description = "Positiveモデルを送信します",
                 onClick = { Log.d("SettingScreen", "Positiveモデルがクリックされました") }
-            )
-            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
-
-            // PositiveモデルURLの設定
-            SettingNavigationItem(
-                title = "Positiveモデル URLを設定",
-                description = "PositiveモデルのURLを設定するためにクリックしてください \n ${viewModel.positiveModelUrl}",
-                onClick = { isPositiveUrlDialogOpen = true }
             )
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
         }
@@ -138,37 +127,9 @@ fun SettingScreen(
             onSave = { newSensingTime, newWaitTime ->
                 viewModel.sensingTime = newSensingTime
                 viewModel.waitTime = newWaitTime
+                viewModel.setSensingTime(context)
                 isSensingTimeDialogOpen = false
                 Log.d("SettingScreen", "センシング中の時間: $newSensingTime 分, 待機時間: $newWaitTime 分")
-            }
-        )
-    }
-
-    if (isNegativeUrlDialogOpen) {
-        UrlInputDialog(
-            title = "Negativeモデル URL",
-            description = "NegativeモデルのURLを入力してください",
-            initialValue = viewModel.negativeModelUrl,
-            onDismiss = { isNegativeUrlDialogOpen = false },
-            onSave = { newUrl ->
-                viewModel.negativeModelUrl = newUrl
-                isNegativeUrlDialogOpen = false
-                Log.d("SettingScreen", "Negativeモデル URL: $newUrl")
-            }
-        )
-    }
-
-    // PositiveモデルのURL入力ダイアログ
-    if (isPositiveUrlDialogOpen) {
-        UrlInputDialog(
-            title = "Positiveモデル URL",
-            description = "PositiveモデルのURLを入力してください",
-            initialValue = viewModel.positiveModelUrl,
-            onDismiss = { isPositiveUrlDialogOpen = false },
-            onSave = { newUrl ->
-                viewModel.positiveModelUrl = newUrl
-                isPositiveUrlDialogOpen = false
-                Log.d("SettingScreen", "Positiveモデル URL: $newUrl")
             }
         )
     }
