@@ -11,6 +11,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import net.kajilab.elpissender.API.SearedPreferenceApi
+import net.kajilab.elpissender.API.http.ApiResponse
+import net.kajilab.elpissender.Repository.UserRepository
 import net.kajilab.elpissender.usecase.SensingUsecase
 
 class SettingViewModel: ViewModel() {
@@ -19,9 +21,12 @@ class SettingViewModel: ViewModel() {
 
     val searedPreferenceApi = SearedPreferenceApi()
     var sensingUsecase:SensingUsecase? = null
+    var apiResponse: ApiResponse? = null
+    val userRepository = UserRepository()
 
     fun init(context: Context){
         sensingUsecase = SensingUsecase(context = context)
+        apiResponse = ApiResponse(context)
     }
 
     fun getSensingTime(context: Context){
@@ -48,10 +53,46 @@ class SettingViewModel: ViewModel() {
 
     fun startSensing10second(){
         viewModelScope.launch {
-            sensingUsecase?.timerStart10s(
+            sensingUsecase?.timerStart(
                 fileName = "",
                 onStopped = {
                     Log.d("SettingViewModel", "センシングが停止しました")
+                },
+                sensingTime = 10,
+            )
+        }
+    }
+
+    fun sendNegativeModel(
+        roomId:Int,
+        sampleType:String,
+        context: Context
+    ){
+        viewModelScope.launch {
+            sensingUsecase?.timerStart(
+                fileName = "",
+                onStopped = {
+                    Log.d("SettingViewModel", "センシングが停止しました")
+                },
+                sensingTime = 10,
+                onSend = { sensorFileList ->
+                    val bleFile = sensorFileList[0]
+                    val wifiFile = sensorFileList[1]
+                    val user = userRepository.getUserSetting(context)
+
+                    if(
+                        bleFile != null &&
+                        wifiFile != null &&
+                        user.serverUrl != ""
+                    ){
+                        apiResponse?.postModelData(
+                            wifiFile = wifiFile,
+                            bleFile = bleFile,
+                            roomId = roomId,
+                            sampleType = sampleType,
+                            url = user.serverUrl,
+                        )
+                    }
                 }
             )
         }

@@ -100,7 +100,14 @@ fun SettingScreen(
             SettingItem(
                 title = "Negativeモデルを送信する",
                 description = "Negativeモデルを送信します",
-                onClick = { Log.d("SettingScreen", "Negativeモデルがクリックされました") }
+                onClick = {
+                    Log.d("SettingScreen", "Negativeモデルがクリックされました")
+                    viewModel.sendNegativeModel(
+                        roomId = 0,
+                        sampleType = "negative",
+                        context = context
+                    )
+                }
             )
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
 

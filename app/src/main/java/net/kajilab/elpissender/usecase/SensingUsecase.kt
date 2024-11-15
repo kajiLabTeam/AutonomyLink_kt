@@ -24,6 +24,7 @@ import net.kajilab.elpissender.Repository.SensorBase
 import net.kajilab.elpissender.Repository.UserRepository
 import net.kajilab.elpissender.Repository.WiFiRepository
 import net.kajilab.elpissender.entity.User
+import java.io.File
 
 class SensingUsecase(
     private val context: Context
@@ -62,9 +63,11 @@ class SensingUsecase(
     fun finalStop() {
         scanFlag = false
         if (targetSensors.isNotEmpty()) {
-            stop {
-                Log.d("SensingService", "バックグラウンドで実行を止めたよ")
-            }
+            stop(
+                onStopped = {
+                    Log.d("SensingService","BackGroundで一回実行されたよ")
+                }
+            )
         }
     }
 
@@ -81,42 +84,58 @@ class SensingUsecase(
         }
     }
 
-    fun stop(onStopped:() -> Unit){
-        val user = userRepository.getUserSetting(context)
+    fun stop(
+        onStopped:() -> Unit,
+        onSend:((List<File?>)->Unit)? = null
+    ){
+
         sensorRepository.sensorStop(
             sensors = targetSensors,
             onStopped = { sensorFileList ->
                 val bleFile = sensorFileList[0]
                 val wifiFile = sensorFileList[1]
 
-                if(
-                    bleFile != null &&
-                    wifiFile != null &&
-                    user.userName != "" &&
-                    user.password != "" &&
-                    user.serverUrl != ""
-                ){
-                    apiResponse.postCsvData(
-                        wifiFile,
-                        bleFile,
-                        user.userName,
-                        user.password,
-                        user.serverUrl
-                    )
+                if (onSend != null) {
+                    onSend( listOf( bleFile, wifiFile ) )
+                }else{
+                    val user = userRepository.getUserSetting(context)
+                    if(
+                        bleFile != null &&
+                        wifiFile != null &&
+                        user.userName != "" &&
+                        user.password != "" &&
+                        user.serverUrl != ""
+                    ){
+                        apiResponse.postCsvData(
+                            wifiFile,
+                            bleFile,
+                            user.userName,
+                            user.password,
+                            user.serverUrl
+                        )
+                    }
                 }
+
                 onStopped()
             }
         )
         targetSensors = mutableListOf() // センサーをリセット
     }
 
-    suspend fun timerStart10s(fileName:String,onStopped:() -> Unit){
+    suspend fun timerStart(
+        fileName:String,
+        onStopped:() -> Unit,
+        sensingTime:Int,
+        onSend: ((List<File?>) -> Unit)? = null
+    ){
         start(fileName)
         Log.d("Timer", "タイマー開始")
-        delay(10000)
+        delay(sensingTime * 1000L)
         Log.d("Timer", "タイマー終了")
-        stop(onStopped)
-        onStopped()
+        stop(
+            onStopped = onStopped,
+            onSend = onSend
+        )
     }
 
     suspend private fun timerStart(
