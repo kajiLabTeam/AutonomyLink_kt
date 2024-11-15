@@ -35,20 +35,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun SettingScreen() {
-
-    var negativeModelUrl by rememberSaveable { mutableStateOf("https://example.com") }
-    var positiveModelUrl by rememberSaveable { mutableStateOf("https://example.com") }
-
-    var sensingTime by rememberSaveable { mutableStateOf(10) }  // センシング中の時間
-    var waitTime by rememberSaveable { mutableStateOf(5) }      // センシング待機時間
-
+fun SettingScreen(
+    viewModel: SettingViewModel = viewModel()
+) {
     var isNegativeUrlDialogOpen by remember { mutableStateOf(false) }
     var isPositiveUrlDialogOpen by remember { mutableStateOf(false) }
     var isSensingTimeDialogOpen by remember { mutableStateOf(false) }
-
 
     Column(
         modifier = Modifier
@@ -63,7 +58,7 @@ fun SettingScreen() {
 
             SettingNavigationItem(
                 title = "センシング時間と待機時間",
-                description = "センシング中の時間: $sensingTime 分, 待機時間: $waitTime 分",
+                description = "センシング中の時間: ${viewModel.sensingTime} 分, 待機時間: ${viewModel.waitTime} 分",
                 onClick = { isSensingTimeDialogOpen = true }
             )
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
@@ -98,7 +93,7 @@ fun SettingScreen() {
             // NegativeモデルURLの設定
             SettingNavigationItem(
                 title = "Negativeモデル URLを設定",
-                description = "NegativeモデルのURLを設定するためにクリックしてください \n $negativeModelUrl",
+                description = "NegativeモデルのURLを設定するためにクリックしてください \n ${viewModel.negativeModelUrl}",
                 onClick = { isNegativeUrlDialogOpen = true }
             )
 
@@ -114,7 +109,7 @@ fun SettingScreen() {
             // PositiveモデルURLの設定
             SettingNavigationItem(
                 title = "Positiveモデル URLを設定",
-                description = "PositiveモデルのURLを設定するためにクリックしてください \n $positiveModelUrl",
+                description = "PositiveモデルのURLを設定するためにクリックしてください \n ${viewModel.positiveModelUrl}",
                 onClick = { isPositiveUrlDialogOpen = true }
             )
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
@@ -137,12 +132,12 @@ fun SettingScreen() {
         TimeIntervalInputDialog(
             title = "センシング設定",
             description = "センシング中の時間と待機時間を設定してください",
-            initialSensingTime = sensingTime,
-            initialWaitTime = waitTime,
+            initialSensingTime = viewModel.sensingTime,
+            initialWaitTime = viewModel.waitTime,
             onDismiss = { isSensingTimeDialogOpen = false },
             onSave = { newSensingTime, newWaitTime ->
-                sensingTime = newSensingTime
-                waitTime = newWaitTime
+                viewModel.sensingTime = newSensingTime
+                viewModel.waitTime = newWaitTime
                 isSensingTimeDialogOpen = false
                 Log.d("SettingScreen", "センシング中の時間: $newSensingTime 分, 待機時間: $newWaitTime 分")
             }
@@ -153,10 +148,10 @@ fun SettingScreen() {
         UrlInputDialog(
             title = "Negativeモデル URL",
             description = "NegativeモデルのURLを入力してください",
-            initialValue = negativeModelUrl,
+            initialValue = viewModel.negativeModelUrl,
             onDismiss = { isNegativeUrlDialogOpen = false },
             onSave = { newUrl ->
-                negativeModelUrl = newUrl
+                viewModel.negativeModelUrl = newUrl
                 isNegativeUrlDialogOpen = false
                 Log.d("SettingScreen", "Negativeモデル URL: $newUrl")
             }
@@ -168,21 +163,15 @@ fun SettingScreen() {
         UrlInputDialog(
             title = "Positiveモデル URL",
             description = "PositiveモデルのURLを入力してください",
-            initialValue = positiveModelUrl,
+            initialValue = viewModel.positiveModelUrl,
             onDismiss = { isPositiveUrlDialogOpen = false },
             onSave = { newUrl ->
-                positiveModelUrl = newUrl
+                viewModel.positiveModelUrl = newUrl
                 isPositiveUrlDialogOpen = false
                 Log.d("SettingScreen", "Positiveモデル URL: $newUrl")
             }
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSettingScreen() {
-    SettingScreen()
 }
 
 @Composable
