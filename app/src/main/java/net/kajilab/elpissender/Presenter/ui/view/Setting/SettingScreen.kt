@@ -44,7 +44,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun SettingScreen(
-    viewModel: SettingViewModel = viewModel()
+    viewModel: SettingViewModel = viewModel(),
+    showSnackbar: (String) -> Unit
 ) {
     var isSensingTimeDialogOpen by remember { mutableStateOf(false) }
     var isModelInputDialogOpen by remember { mutableStateOf(false) }
@@ -184,6 +185,7 @@ fun SettingScreen(
                     sensingTime = time,
                     onStopped = {
                         isLoading = false
+                        showSnackbar("計測が終了し送信しました")
                     }
                 )
             }

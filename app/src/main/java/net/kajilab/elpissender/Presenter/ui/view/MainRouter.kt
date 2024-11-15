@@ -52,7 +52,9 @@ fun MainRouter(
             changeTopBarTitle(BottomNavigationBarRoute.USER.title)
         }
         composable(BottomNavigationBarRoute.SETTING.route) {
-            SettingScreen()
+            SettingScreen(
+                showSnackbar = showSnackbar
+            )
             topAppBarActions(
                 listOf()
             )
