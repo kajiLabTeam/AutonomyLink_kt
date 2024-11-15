@@ -31,14 +31,15 @@ class SensingUsecase(
     private val apiResponse = ApiResponse(context)
     private val sensorRepository = SensingRepository(context)
     private val searedPreferenceApi = SearedPreferenceApi()
+    private val userRepository = UserRepository()
 
     private var scanFlag = false
     private var targetSensors: MutableList<SensorBase> = mutableListOf()
-    private val serviceScope = CoroutineScope(Dispatchers.IO)
 
-    private var user = User()
+    // CoroutineScopeの定義
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    fun firstStart(user: User){
+    suspend fun firstStart(){
         val sensingTime = searedPreferenceApi.getIntegerValueByKey(
             key = "sensingTime",
             context = context
@@ -47,8 +48,6 @@ class SensingUsecase(
             key = "waitTime",
             context = context
         )
-
-        this.user = user
         scanFlag = true
         timerStart(
             fileName = "background",
@@ -73,7 +72,7 @@ class SensingUsecase(
         addSensor(context = context)
 
         val samplingFrequency = -1.0
-        serviceScope.launch {
+        coroutineScope.launch {
             sensorRepository.sensorStart(
                 fileName = fileName,
                 sensors = targetSensors,
@@ -83,6 +82,7 @@ class SensingUsecase(
     }
 
     fun stop(onStopped:() -> Unit){
+        val user = userRepository.getUserSetting(context)
         sensorRepository.sensorStop(
             sensors = targetSensors,
             onStopped = { sensorFileList ->
@@ -119,24 +119,22 @@ class SensingUsecase(
         onStopped()
     }
 
-    private fun timerStart(
+    suspend private fun timerStart(
         fileName:String,
         onStopped:() -> Unit,
         sensingTime:Int,
         waitTime:Int
     ){
-        serviceScope.launch {
-            while(scanFlag){
-                start(fileName)
-                Log.d("Timer", "タイマー開始")
-                delay(sensingTime * 60 * 1000L)
-                Log.d("Timer", "タイマー終了")
-                if(targetSensors.isNotEmpty()){
-                    stop(onStopped)
-                    onStopped()
-                }
-                delay(    waitTime * 60 * 1000L)
+        while(scanFlag){
+            start(fileName)
+            Log.d("Timer", "タイマー開始")
+            delay(sensingTime * 60 * 1000L)
+            Log.d("Timer", "タイマー終了")
+            if(targetSensors.isNotEmpty()){
+                stop(onStopped)
+                onStopped()
             }
+            delay(waitTime * 60 * 1000L)
         }
     }
 

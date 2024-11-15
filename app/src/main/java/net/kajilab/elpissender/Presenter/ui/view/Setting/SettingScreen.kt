@@ -49,6 +49,7 @@ fun SettingScreen(
 
     LaunchedEffect(Unit){
         viewModel.getSetting(context)
+        viewModel.init(context)
     }
 
     Column(
@@ -72,7 +73,10 @@ fun SettingScreen(
             SettingItem(
                 title = "BLEとWi-Fiを10秒間取得する",
                 description = "10秒間BLEとWi-Fiを取得した後、送信します",
-                onClick = { Log.d("SettingScreen", "BLEとWi-Fiがクリックされました") }
+                onClick = {
+                    viewModel.startSensing10second()
+                    Log.d("SettingScreen", "BLEとWi-Fiがクリックされました")
+                }
             )
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
 
@@ -81,7 +85,11 @@ fun SettingScreen(
                 description = "BLEとWi-Fiを取得し、送信します。止めるまで送信はされません。",
                 checked = false,
                 onCheckedChange = { isChecked ->
-                    Log.d("SettingScreen", "BLEとWi-Fiが${if (isChecked) "有効" else "無効"}になりました")
+                    if(isChecked){
+                        viewModel.startSensing()
+                    }else{
+                        viewModel.stopSensing()
+                    }
                 }
             )
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)

@@ -11,6 +11,9 @@ import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.kajilab.elpissender.API.SearedPreferenceApi
 import net.kajilab.elpissender.R
 import net.kajilab.elpissender.Repository.UserRepository
@@ -18,14 +21,15 @@ import net.kajilab.elpissender.usecase.SensingUsecase
 
 class SensingService: Service() {
     val sensingUsecase = SensingUsecase(this)
-    val userRepository = UserRepository()
     val searedPreferenceApi = SearedPreferenceApi()
+    private val serviceScope = CoroutineScope(Dispatchers.IO)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         searedPreferenceApi.setBooleanValueByKey("isSensing",true,this)
-        val user = userRepository.getUserSetting(this)
         startForeground()
-        sensingUsecase.firstStart(user)
+        serviceScope.launch {
+            sensingUsecase.firstStart()
+        }
         return super.onStartCommand(intent, flags, startId)
     }
 
