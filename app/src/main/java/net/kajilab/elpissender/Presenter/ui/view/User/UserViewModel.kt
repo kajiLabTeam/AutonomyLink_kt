@@ -54,10 +54,6 @@ class UserViewModel: ViewModel() {
         showSnackbar("ユーザー情報を保存しました")
     }
 
-    fun checkHealthyService(){
-
-    }
-
     fun getSensingStatus(context: Context): Boolean {
         return searedPreferenceApi.getBooleanValueByKey("isSensing",context)
     }
