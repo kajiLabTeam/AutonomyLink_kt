@@ -66,15 +66,18 @@ class SettingViewModel: ViewModel() {
     fun sendNegativeModel(
         roomId:Int,
         sampleType:String,
-        context: Context
+        sensingTime:Int,
+        context: Context,
+        onStopped: () -> Unit,
     ){
         viewModelScope.launch {
             sensingUsecase?.timerStart(
                 fileName = "",
                 onStopped = {
                     Log.d("SettingViewModel", "センシングが停止しました")
+                    onStopped()
                 },
-                sensingTime = 10,
+                sensingTime = sensingTime,
                 onSend = { sensorFileList ->
                     val bleFile = sensorFileList[0]
                     val wifiFile = sensorFileList[1]

@@ -1,8 +1,10 @@
 package net.kajilab.elpissender.Presenter.ui.view.Setting
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +26,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -44,12 +47,26 @@ fun SettingScreen(
     viewModel: SettingViewModel = viewModel()
 ) {
     var isSensingTimeDialogOpen by remember { mutableStateOf(false) }
+    var isModelInputDialogOpen by remember { mutableStateOf(false) }
+    var modelInputDialogType by rememberSaveable { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var elapsedTime by remember { mutableIntStateOf(0) }
 
     val context = LocalContext.current
 
     LaunchedEffect(Unit){
         viewModel.getSetting(context)
         viewModel.init(context)
+    }
+
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            elapsedTime = 0
+            while (isLoading) {
+                kotlinx.coroutines.delay(1000)
+                elapsedTime++
+            }
+        }
     }
 
     Column(
@@ -102,11 +119,8 @@ fun SettingScreen(
                 description = "Negativeモデルを送信します",
                 onClick = {
                     Log.d("SettingScreen", "Negativeモデルがクリックされました")
-                    viewModel.sendNegativeModel(
-                        roomId = 0,
-                        sampleType = "negative",
-                        context = context
-                    )
+                    modelInputDialogType = "negative"
+                    isModelInputDialogOpen = true
                 }
             )
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
@@ -114,7 +128,11 @@ fun SettingScreen(
             SettingItem(
                 title = "Positiveモデルを送信する",
                 description = "Positiveモデルを送信します",
-                onClick = { Log.d("SettingScreen", "Positiveモデルがクリックされました") }
+                onClick = {
+                    Log.d("SettingScreen", "Positiveモデルがクリックされました")
+                    modelInputDialogType = "positive"
+                    isModelInputDialogOpen = true
+                }
             )
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
         }
@@ -148,6 +166,128 @@ fun SettingScreen(
             }
         )
     }
+
+    if (isModelInputDialogOpen) {
+        ModelInputDialog(
+            title = if(modelInputDialogType == "negative") "Negativeモデル計測" else "Positiveモデル計測",
+            description = "部屋番号と計測時間を入力してください",
+            initialRoomId = 0,
+            initialMeasurementTime = 10,
+            onDismiss = { isModelInputDialogOpen = false },
+            onStartMeasurement = { roomId, time ->
+                isModelInputDialogOpen = false
+                isLoading = true
+                viewModel.sendNegativeModel(
+                    roomId = roomId,
+                    sampleType = if(modelInputDialogType == "negative") "negative" else "positive",
+                    context = context,
+                    sensingTime = time,
+                    onStopped = {
+                        isLoading = false
+                    }
+                )
+            }
+        )
+    }
+
+    if (isLoading) {
+        LoadingScreen(elapsedTime = elapsedTime)
+    }
+}
+
+@Composable
+fun ModelInputDialog(
+    title: String,
+    description: String,
+    initialRoomId: Int,
+    initialMeasurementTime: Int,
+    onDismiss: () -> Unit,
+    onStartMeasurement: (Int, Int) -> Unit
+) {
+    var roomId by remember { mutableIntStateOf(initialRoomId) }
+    var measurementTime by remember { mutableIntStateOf(initialMeasurementTime) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = title) },
+        text = {
+            Column {
+                Text(text = description, color = Color.Gray)
+
+                OutlinedTextField(
+                    value = roomId.toString(),
+                    onValueChange = { roomId = it.toIntOrNull() ?: roomId },
+                    label = { Text("部屋番号") },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                )
+
+                OutlinedTextField(
+                    value = measurementTime.toString(),
+                    onValueChange = { measurementTime = it.toIntOrNull() ?: measurementTime },
+                    label = { Text("計測時間（秒）") },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                onStartMeasurement(roomId, measurementTime)
+            }) {
+                Text("開始")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("キャンセル")
+            }
+        }
+    )
+}
+
+@Preview
+@Composable
+fun PreviewNegativeModelInputDialog() {
+    ModelInputDialog(
+        title = "Negativeモデル計測",
+        description = "部屋番号と計測時間を入力してください",
+        initialRoomId = 0,
+        initialMeasurementTime = 10,
+        onDismiss = {},
+        onStartMeasurement = { _, _ -> }
+    )
+}
+
+@Composable
+fun LoadingScreen(elapsedTime: Int) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f)), // 背景を薄暗く設定
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            androidx.compose.material3.CircularProgressIndicator()
+            Text(
+                text = "計測中: ${elapsedTime}秒経過",
+                modifier = Modifier.padding(top = 16.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White // テキストを白に設定して見やすく
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewLoadingScreen() {
+    LoadingScreen(elapsedTime = 10)
 }
 
 @Composable
