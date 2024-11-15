@@ -76,6 +76,7 @@ dependencies {
 
     //easyPermission
     implementation(libs.easypermissions)
+    implementation(libs.accompanist.permissions)
 
     // Rxjava
     implementation (libs.rxandroid)
