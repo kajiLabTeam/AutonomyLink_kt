@@ -22,7 +22,8 @@ fun MainRouter(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     topAppBarActions: ( List<@Composable () -> Unit>) -> Unit,
-    toSettingScreen: () -> Unit
+    toSettingScreen: () -> Unit,
+    showSnackbar: (String) -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -36,7 +37,9 @@ fun MainRouter(
             changeTopBarTitle(BottomNavigationBarRoute.HOME.title)
         }
         composable(BottomNavigationBarRoute.USER.route) {
-            UserScreen()
+            UserScreen(
+                showSnackbar = showSnackbar
+            )
             topAppBarActions(
                 listOf{
                     IconButton(onClick = {

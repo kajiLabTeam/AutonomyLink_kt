@@ -1,5 +1,6 @@
 package net.kajilab.elpissender.Presenter.ui.view.User
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -20,9 +22,11 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,7 +36,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun UserScreen(
     viewModel: UserViewModel = viewModel(),
+    showSnackbar: (String) -> Unit
 ) {
+    val activity = LocalContext.current as Activity
+
+    LaunchedEffect(Unit){
+        viewModel.userName = viewModel.getUserName(activity)
+        viewModel.password = viewModel.getPassword(activity)
+        viewModel.serverUrl = viewModel.getServerUrl(activity)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -94,17 +107,22 @@ fun UserScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         TextField(
-            value = viewModel.password,
-            onValueChange = { viewModel.password = it },
+            value = viewModel.serverUrl,
+            onValueChange = { viewModel.serverUrl = it },
             label = { Text("サーバーのURL") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun UserScreenPreview() {
-    UserScreen()
+        Button(
+            onClick = {
+                viewModel.saveUserSetting(activity)
+                showSnackbar("保存しました")
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+        ){
+            Text("保存")
+        }
+    }
 }
