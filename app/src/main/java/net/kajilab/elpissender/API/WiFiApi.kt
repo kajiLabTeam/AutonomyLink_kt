@@ -82,6 +82,11 @@ class WiFiApi {
     }
 
     fun stop(context: Context){
-        context.unregisterReceiver(wifiScanReceiver)
+        try {
+            context.unregisterReceiver(wifiScanReceiver)
+        } catch (e: IllegalArgumentException) {
+            // Receiverが登録されていない場合の例外を無視
+            Log.e(TAG, "Receiver is not registered", e)
+        }
     }
 }
