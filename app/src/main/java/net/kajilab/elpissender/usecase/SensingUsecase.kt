@@ -43,11 +43,13 @@ class SensingUsecase(
     suspend fun firstStart(){
         val sensingTime = searedPreferenceApi.getIntegerValueByKey(
             key = "sensingTime",
-            context = context
+            context = context,
+            defaultValue = 5
         )
         val waitTime = searedPreferenceApi.getIntegerValueByKey(
             key = "waitTime",
-            context = context
+            context = context,
+            defaultValue = 10
         )
         scanFlag = true
         timerStart(
