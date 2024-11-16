@@ -52,17 +52,11 @@ class ApiResponse(val context: Context) {
         val bleRequestBody = bleFile.asRequestBody("text/csv".toMediaTypeOrNull())
         val blePart = MultipartBody.Part.createFormData("ble_data", bleFile.name, bleRequestBody)
 
-        val request = FingerPrintSendData(
-            sampleType = sampleType,
-            roomId = roomId
-        )
-
-        val gson = Gson()
-        val requestJson = gson.toJson(request)
-        val requestBody = requestJson.toRequestBody("application/json".toMediaTypeOrNull())
+        val sampleTypePart = MultipartBody.Part.createFormData("sample_type", sampleType)
+        val roomIdPart = MultipartBody.Part.createFormData("room_id", roomId.toString())
 
         // リクエストを送信
-        val call = apiService.sendFingerPrintModel(wifiPart, blePart, requestBody)
+        val call = apiService.sendFingerPrintModel(wifiPart, blePart,sampleTypePart,roomIdPart)
         call.enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {

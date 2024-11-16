@@ -22,6 +22,7 @@ interface ApiService {
     fun sendFingerPrintModel(
         @Part wifiData: MultipartBody.Part?,
         @Part bleData: MultipartBody.Part?,
-        @Part("request") requestBody: RequestBody // 文字列として送信
+        @Part sampleType:MultipartBody.Part?,
+        @Part roomId:MultipartBody.Part?
     ): Call<ResponseBody>
 }
