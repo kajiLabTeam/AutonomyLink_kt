@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.CoroutineScope
@@ -39,6 +40,22 @@ class SensingUsecase(
 
     // CoroutineScopeの定義
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
+    private var wakeLock: PowerManager.WakeLock? = null
+
+    private fun acquireWakeLock() {
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakeLock = powerManager.newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK,
+            "SensingUsecase::WakeLock"
+        )
+        wakeLock?.acquire(10*60*1000L /*10 minutes*/)
+    }
+
+    private fun releaseWakeLock() {
+        wakeLock?.release()
+        wakeLock = null
+    }
 
     suspend fun firstStart(){
         val sensingTime = searedPreferenceApi.getIntegerValueByKey(
@@ -146,16 +163,21 @@ class SensingUsecase(
         sensingTime:Int,
         waitTime:Int
     ){
-        while(scanFlag){
-            start(fileName)
-            Log.d("Timer", "タイマー開始")
-            delay(sensingTime * 60 * 1000L)
-            Log.d("Timer", "タイマー終了")
-            if(targetSensors.isNotEmpty()){
-                stop(onStopped)
-                onStopped()
+        acquireWakeLock() // WakeLockを取得
+        try {
+            while (scanFlag) {
+                start(fileName)
+                Log.d("Timer", "タイマー開始")
+                delay(sensingTime * 60 * 1000L)
+                Log.d("Timer", "タイマー終了")
+                if (targetSensors.isNotEmpty()) {
+                    stop(onStopped)
+                    onStopped()
+                }
+                delay(waitTime * 60 * 1000L)
             }
-            delay(waitTime * 60 * 1000L)
+        } finally {
+            releaseWakeLock() // WakeLockを解放
         }
     }
 
