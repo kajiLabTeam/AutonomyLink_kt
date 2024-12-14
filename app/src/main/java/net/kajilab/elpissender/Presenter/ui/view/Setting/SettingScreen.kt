@@ -46,6 +46,7 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import net.kajilab.elpissender.Service.SensingWorker
+import net.kajilab.elpissender.Utils.FirebaseLogger
 import java.util.concurrent.TimeUnit
 
 @Composable
@@ -169,6 +170,20 @@ fun SettingScreen(
                 title = "アプリについて",
                 description = "バージョン情報・プライバシーポリシーなど",
                 onClick = { Log.d("SettingScreen", "アプリについてがクリックされました") }
+            )
+            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+        }
+
+        SettingSectionTitle(title = "デバック実装"){
+            SettingItem(
+                title = "とりあえず、アナリティクスを送るぞ",
+                description = "アナリティクスを送ってみます",
+                onClick = {
+                    val firebaseLogger = FirebaseLogger(context)
+                    firebaseLogger.logMessage(
+                        "hello world"
+                    )
+                }
             )
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
         }
