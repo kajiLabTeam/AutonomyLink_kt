@@ -10,10 +10,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import net.kajilab.elpissender.API.SearedPreferenceApi
 import net.kajilab.elpissender.Repository.UserRepository
 import net.kajilab.elpissender.Service.SensingService
+import net.kajilab.elpissender.Service.SensingWorker
 import net.kajilab.elpissender.entity.User
+import java.util.concurrent.TimeUnit
 
 class UserViewModel: ViewModel() {
 
@@ -55,7 +59,8 @@ class UserViewModel: ViewModel() {
     }
 
     fun getSensingStatus(context: Context): Boolean {
-        return searedPreferenceApi.getBooleanValueByKey("isSensing",context)
+        val wokManager = WorkManager.getInstance(context)
+        return wokManager.getWorkInfosByTag(SensingWorker.WorkerTag).get().isNotEmpty()
     }
 
     fun getUserSetting(context: Context): User {
@@ -77,16 +82,20 @@ class UserViewModel: ViewModel() {
             }
 
             // TODO: ここで、通知と位置情報などのパーミッションチェックをしておくといい
-            val serviceIntent = Intent(context, SensingService::class.java)
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(serviceIntent)
-            } else {
-                context.startService(serviceIntent)
-            }
+            val wokManager = WorkManager.getInstance(context)
+            val sensingWorkerRequest = PeriodicWorkRequest.Builder(
+                SensingWorker::class.java,
+                20, TimeUnit.MINUTES, // インターバルの時間
+                10, TimeUnit.MINUTES  // フレックスの時間
+            )
+                .apply {
+                    addTag(SensingWorker.WorkerTag)
+                }
+                .build()
+            wokManager.enqueue(sensingWorkerRequest)
         }else{
-            val serviceIntent = Intent(context, SensingService::class.java)
-            context.stopService(serviceIntent)
+            val wokManager = WorkManager.getInstance(context)
+            wokManager.cancelAllWorkByTag(SensingWorker.WorkerTag)
         }
     }
 }

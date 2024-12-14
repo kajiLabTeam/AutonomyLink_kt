@@ -105,25 +105,6 @@ fun SettingScreen(
             )
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
 
-            SettingItem(
-                title = "workManagerでBLEとWi-Fiを10秒間取得する",
-                description = "10秒間BLEとWi-Fiを取得した後、送信します",
-                onClick = {
-
-                    val wokManager = WorkManager.getInstance(context)
-                    val sensingWorkerRequest = PeriodicWorkRequest.Builder(
-                        SensingWorker::class.java,
-                        20, TimeUnit.MINUTES, // インターバルの時間
-                        10, TimeUnit.MINUTES  // フレックスの時間
-                    )
-                        .build()
-                    wokManager.enqueue(sensingWorkerRequest)
-
-                    Log.d("SettingScreen", "BLEとWi-Fiがクリックされました")
-                }
-            )
-            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
-
             SettingSwitchItem(
                 title = "BLEとWi-Fiを取得する",
                 description = "BLEとWi-Fiを取得し、送信します。止めるまで送信はされません。",

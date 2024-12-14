@@ -24,6 +24,10 @@ class SensingWorker (
     workerParameters: WorkerParameters
 ) : CoroutineWorker(context, workerParameters) {
 
+    companion object{
+        val WorkerTag = "sensing_worker"
+    }
+
     private val TAG = "SensingWorker"
     private val NOTIFICATION_ID = 1
 
