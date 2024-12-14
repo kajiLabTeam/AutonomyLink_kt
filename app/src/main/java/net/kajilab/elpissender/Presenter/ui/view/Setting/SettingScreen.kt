@@ -41,6 +41,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
+import net.kajilab.elpissender.Service.SensingWorker
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun SettingScreen(
@@ -93,6 +99,25 @@ fun SettingScreen(
                 description = "10秒間BLEとWi-Fiを取得した後、送信します",
                 onClick = {
                     viewModel.startSensing10second()
+                    Log.d("SettingScreen", "BLEとWi-Fiがクリックされました")
+                }
+            )
+            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+
+            SettingItem(
+                title = "workManagerでBLEとWi-Fiを10秒間取得する",
+                description = "10秒間BLEとWi-Fiを取得した後、送信します",
+                onClick = {
+
+                    val wokManager = WorkManager.getInstance(context)
+                    val sensingWorkerRequest = PeriodicWorkRequest.Builder(
+                        SensingWorker::class.java,
+                        20, TimeUnit.MINUTES, // インターバルの時間
+                        10, TimeUnit.MINUTES  // フレックスの時間
+                    )
+                        .build()
+                    wokManager.enqueue(sensingWorkerRequest)
+
                     Log.d("SettingScreen", "BLEとWi-Fiがクリックされました")
                 }
             )

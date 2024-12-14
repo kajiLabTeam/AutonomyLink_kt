@@ -58,7 +58,7 @@ class SettingViewModel: ViewModel() {
                 onStopped = {
                     Log.d("SettingViewModel", "センシングが停止しました")
                 },
-                sensingTime = 10,
+                sensingSecond = 10,
             )
         }
     }
@@ -77,7 +77,7 @@ class SettingViewModel: ViewModel() {
                     Log.d("SettingViewModel", "センシングが停止しました")
                     onStopped()
                 },
-                sensingTime = sensingTime,
+                sensingSecond = sensingTime,
                 onSend = { sensorFileList ->
                     val bleFile = sensorFileList[0]
                     val wifiFile = sensorFileList[1]

@@ -144,12 +144,12 @@ class SensingUsecase(
     suspend fun timerStart(
         fileName:String,
         onStopped:() -> Unit,
-        sensingTime:Int,
+        sensingSecond:Int,
         onSend: ((List<File?>) -> Unit)? = null
     ){
         start(fileName)
         Log.d("Timer", "タイマー開始")
-        delay(sensingTime * 1000L)
+        delay(sensingSecond * 1000L)
         Log.d("Timer", "タイマー終了")
         stop(
             onStopped = onStopped,
