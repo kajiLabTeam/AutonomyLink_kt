@@ -53,7 +53,7 @@ class SensingWorker (
                     firebaseLogger.logSensing("end","センシングを終了しました。")
                     Log.d("SettingViewModel", "センシングが停止しました")
                 },
-                sensingSecond = 10 * 60,
+                sensingSecond = 30,
             )
         }
         return Result.success()
