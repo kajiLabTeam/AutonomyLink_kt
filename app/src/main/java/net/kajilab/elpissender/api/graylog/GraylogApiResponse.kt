@@ -6,9 +6,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class GlaylogApiResponse {
+class GraylogApiResponse {
     fun sendLog(logData: LogData) {
-        GlaylogRetrofitClient.instance.sendLog(logData).enqueue(
+        GraylogRetrofitClient.instance.sendLog(logData).enqueue(
             object : Callback<Void> {
                 override fun onResponse(
                     call: Call<Void>,

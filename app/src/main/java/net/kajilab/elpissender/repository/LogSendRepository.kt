@@ -1,10 +1,10 @@
 package net.kajilab.elpissender.repository
 
-import net.kajilab.elpissender.api.graylog.GlaylogApiResponse
+import net.kajilab.elpissender.api.graylog.GraylogApiResponse
 import net.kajilab.elpissender.entity.LogData
 
 class LogSendRepository {
-    val glaylogApiResponse = GlaylogApiResponse()
+    val glaylogApiResponse = GraylogApiResponse()
 
     fun sendLog(
         result: String,
