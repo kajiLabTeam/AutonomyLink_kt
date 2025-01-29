@@ -12,17 +12,19 @@ class SharedPreferenceApi {
 
     private fun initEncryptedPrefs(context: Context) {
         if (!::encryptedPrefs.isInitialized) {
-            val masterKey = MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
+            val masterKey =
+                MasterKey.Builder(context)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build()
 
-            encryptedPrefs = EncryptedSharedPreferences.create(
-                context,
-                "encrypted_prefs",
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
+            encryptedPrefs =
+                EncryptedSharedPreferences.create(
+                    context,
+                    "encrypted_prefs",
+                    masterKey,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+                )
         }
     }
 

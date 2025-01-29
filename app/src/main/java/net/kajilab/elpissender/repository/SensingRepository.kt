@@ -6,7 +6,6 @@ import android.util.Log
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.File
 
@@ -26,7 +25,6 @@ class SensingRepository(context: Context) {
         sensors: MutableList<SensorBase>,
         samplingFrequency: Double,
     ) {
-
         require(fileName.isNotBlank()) { "File name cannot be empty" }
         require(samplingFrequency > 0) { "Sampling frequency must be positive" }
         require(sensors.isNotEmpty()) { "Sensors list cannot be empty" }
@@ -72,7 +70,7 @@ class SensingRepository(context: Context) {
                     { e ->
                         Log.e(tag, "センサー停止 失敗", e)
                     },
-                )
+                ),
         )
     }
 

@@ -18,7 +18,7 @@ class UserRepository {
     }
 
     fun getPassword(context: Context): String {
-        return sharedPreferenceApi.getSecureStringValueByKey(KEY_PASSWORD,context)
+        return sharedPreferenceApi.getSecureStringValueByKey(KEY_PASSWORD, context)
     }
 
     fun getServerUrl(context: Context): String {
