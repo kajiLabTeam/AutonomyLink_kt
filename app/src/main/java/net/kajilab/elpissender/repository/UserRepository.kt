@@ -1,43 +1,52 @@
 package net.kajilab.elpissender.repository
 
 import android.content.Context
+import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import net.kajilab.elpissender.api.SearedPreferenceApi
 import net.kajilab.elpissender.entity.User
 
 class UserRepository {
     val searedPreferenceApi = SearedPreferenceApi()
 
+    companion object {
+        private const val KEY_USER_NAME = "userName"
+        private const val KEY_PASSWORD = "password"
+        private const val KEY_SERVER_URL = "serverUrl"
+    }
+
     fun getUserName(context: Context): String {
-        return searedPreferenceApi.getStringValueByKey("userName", context)
+        return searedPreferenceApi.getStringValueByKey(KEY_USER_NAME, context)
     }
 
     fun getPassword(context: Context): String {
-        return searedPreferenceApi.getStringValueByKey("password", context)
+        return searedPreferenceApi.getSecureStringValueByKey(KEY_PASSWORD,context)
     }
 
     fun getServerUrl(context: Context): String {
-        return searedPreferenceApi.getStringValueByKey("serverUrl", context)
+        return searedPreferenceApi.getStringValueByKey(KEY_SERVER_URL, context)
     }
 
     fun updateUserName(
         name: String,
         context: Context,
     ) {
-        searedPreferenceApi.setStringValueByKey("userName", name, context)
+        searedPreferenceApi.setStringValueByKey(KEY_USER_NAME, name, context)
     }
 
     fun updatePassword(
         password: String,
         context: Context,
     ) {
-        searedPreferenceApi.setStringValueByKey("password", password, context)
+        searedPreferenceApi.setSecureStringValueByKey(KEY_PASSWORD, password, context)
     }
 
     fun updateServerUrl(
         url: String,
         context: Context,
     ) {
-        searedPreferenceApi.setStringValueByKey("serverUrl", url, context)
+        searedPreferenceApi.setStringValueByKey(KEY_SERVER_URL, url, context)
     }
 
     fun saveUserSetting(

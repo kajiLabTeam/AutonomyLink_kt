@@ -55,8 +55,10 @@ class WiFiApi {
             // WiFiスキャンの非同期処理を実装
             // 例えば、WiFiManagerを使用してスキャンを実行する
             val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-            wifiManager.startScan()
-            // スキャン結果を取得する処理を追加
+            val success = wifiManager.startScan()
+            if (!success) {
+                Log.w(tag, "WiFiスキャンの開始に失敗しました")
+            }
         }
     }
 

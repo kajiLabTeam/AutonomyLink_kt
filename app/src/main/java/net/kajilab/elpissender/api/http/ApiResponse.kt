@@ -65,8 +65,14 @@ class ApiResponse(val context: Context) {
 
     // 共通のエラーハンドリング
     private fun handleFailure(t: Throwable) {
-        t.printStackTrace()
-        logSendRepository.sendLog("error", t.message.toString(), 1)
+        val errorMessage =
+            when (t) {
+                is java.net.UnknownHostException -> "サーバーに接続できません"
+                is java.net.SocketTimeoutException -> "接続がタイムアウトしました"
+                else -> t.message ?: "不明なエラーが発生しました"
+            }
+        Log.e(tag, errorMessage, t)
+        logSendRepository.sendLog("error", errorMessage, 2)
     }
 
     // モデルデータの送信
