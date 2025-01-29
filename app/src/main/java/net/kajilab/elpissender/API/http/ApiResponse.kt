@@ -2,7 +2,7 @@ package net.kajilab.elpissender.API.http
 
 import android.content.Context
 import android.util.Log
-import net.kajilab.elpissender.Utils.FirebaseLogger
+import net.kajilab.elpissender.Repository.LogSendRepository
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -18,7 +18,7 @@ import java.io.File
 
 class ApiResponse(val context: Context) {
 
-    private val firebaseLogger = FirebaseLogger(context)
+    private val logSendRepository = LogSendRepository()
     private val TAG = "ApiResponse"
 
     // OkHttpClientのセットアップ
@@ -47,7 +47,7 @@ class ApiResponse(val context: Context) {
     // 共通のレスポンス処理
     private fun handleResponse(response: Response<ResponseBody>) {
         val responseString = response.body()?.string() ?: "null"
-        firebaseLogger.logSend(response.code().toString(), responseString)
+        logSendRepository.sendLog(response.code().toString(), responseString,1)
         Log.d(TAG, "ResponseCode: ${response.code()} , ResponseMessage: $responseString")
 
         if (response.isSuccessful) {
@@ -60,7 +60,7 @@ class ApiResponse(val context: Context) {
     // 共通のエラーハンドリング
     private fun handleFailure(t: Throwable) {
         t.printStackTrace()
-        firebaseLogger.logSend("error", t.message.toString())
+        logSendRepository.sendLog("error", t.message.toString(),1)
     }
 
     // モデルデータの送信

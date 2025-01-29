@@ -45,8 +45,8 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import net.kajilab.elpissender.Repository.LogSendRepository
 import net.kajilab.elpissender.Service.SensingWorker
-import net.kajilab.elpissender.Utils.FirebaseLogger
 import java.util.concurrent.TimeUnit
 
 @Composable
@@ -160,9 +160,11 @@ fun SettingScreen(
                 title = "とりあえず、アナリティクスを送るぞ",
                 description = "アナリティクスを送ってみます",
                 onClick = {
-                    val firebaseLogger = FirebaseLogger(context)
-                    firebaseLogger.logMessage(
-                        "hello world"
+                    val LogSendRepository = LogSendRepository()
+                    LogSendRepository.sendLog(
+                        result = "success",
+                        message = "test",
+                        level = 1
                     )
                 }
             )

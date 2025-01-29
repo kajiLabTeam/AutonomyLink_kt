@@ -16,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.kajilab.elpissender.API.SearedPreferenceApi
 import net.kajilab.elpissender.R
-import net.kajilab.elpissender.Utils.FirebaseLogger
+import net.kajilab.elpissender.Repository.LogSendRepository
 import net.kajilab.elpissender.usecase.SensingUsecase
 
 class SensingWorker (
@@ -34,7 +34,7 @@ class SensingWorker (
     val sensingUsecase = SensingUsecase(context)
     val searedPreferenceApi = SearedPreferenceApi()
     private val serviceScope = CoroutineScope(Dispatchers.IO)
-    val firebaseLogger = FirebaseLogger(context)
+    val logSendRepository = LogSendRepository()
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return ForegroundInfo(
@@ -46,11 +46,11 @@ class SensingWorker (
         searedPreferenceApi.setBooleanValueByKey("isSensing",true,context)
         serviceScope.launch {
 
-            firebaseLogger.logSensing("start","センシングを開始しました")
+            logSendRepository.sendLog("start","センシングを開始しました",1)
             sensingUsecase.timerStart(
                 fileName = "",
                 onStopped = {
-                    firebaseLogger.logSensing("end","センシングを終了しました。")
+                    logSendRepository.sendLog("end","センシングを終了しました。",1)
                     Log.d("SettingViewModel", "センシングが停止しました")
                 },
                 sensingSecond = 30,
