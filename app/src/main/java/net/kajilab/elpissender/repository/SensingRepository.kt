@@ -25,13 +25,23 @@ class SensingRepository(context: Context) {
         sensors: MutableList<SensorBase>,
         samplingFrequency: Double,
     ) {
+
+        require(fileName.isNotBlank()) { "File name cannot be empty" }
+        require(samplingFrequency > 0) { "Sampling frequency must be positive" }
+        require(sensors.isNotEmpty()) { "Sensors list cannot be empty" }
+
         for (sensor in sensors) {
-            sensor.init()
-            sensor.start(
-                filename = fileName,
-                samplingFrequency = samplingFrequency,
-            )
-            Log.d(tag, "fileName = $fileName")
+            try {
+                sensor.init()
+                sensor.start(
+                    filename = fileName,
+                    samplingFrequency = samplingFrequency,
+                )
+                Log.d(tag, "fileName = $fileName")
+            } catch (e: Exception) {
+                Log.e(tag, "センサー開始失敗", e)
+                throw e
+            }
         }
     }
 
