@@ -93,6 +93,6 @@ dependencies {
     implementation (libs.androidx.work.runtime.ktx)
 
     //firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
+//    implementation(platform(libs.firebase.bom))
+//    implementation(libs.firebase.analytics)
 }
