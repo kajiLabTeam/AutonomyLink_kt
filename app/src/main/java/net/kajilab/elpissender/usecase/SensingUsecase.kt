@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.kajilab.elpissender.api.SearedPreferenceApi
+import net.kajilab.elpissender.api.SharedPreferenceApi
 import net.kajilab.elpissender.api.http.ApiResponse
 import net.kajilab.elpissender.repository.BLERepository
 import net.kajilab.elpissender.repository.SensingRepository
@@ -21,7 +21,7 @@ class SensingUsecase(
 ) {
     private val apiResponse = ApiResponse(context)
     private val sensorRepository = SensingRepository(context)
-    private val searedPreferenceApi = SearedPreferenceApi()
+    private val sharedPreferenceApi = SharedPreferenceApi()
     private val userRepository = UserRepository()
 
     private var scanFlag = false
@@ -49,13 +49,13 @@ class SensingUsecase(
 
     suspend fun firstStart() {
         val sensingTime =
-            searedPreferenceApi.getIntegerValueByKey(
+            sharedPreferenceApi.getIntegerValueByKey(
                 key = "sensingTime",
                 context = context,
                 defaultValue = 5,
             )
         val waitTime =
-            searedPreferenceApi.getIntegerValueByKey(
+            sharedPreferenceApi.getIntegerValueByKey(
                 key = "waitTime",
                 context = context,
                 defaultValue = 10,
@@ -130,6 +130,8 @@ class SensingUsecase(
             },
         )
         targetSensors = mutableListOf() // センサーをリセット
+
+        sensorRepository.onCleared() // メモリーリークを防止する
     }
 
     suspend fun timerStart(

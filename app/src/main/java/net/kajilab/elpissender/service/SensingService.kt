@@ -14,12 +14,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.kajilab.elpissender.R
-import net.kajilab.elpissender.api.SearedPreferenceApi
+import net.kajilab.elpissender.api.SharedPreferenceApi
 import net.kajilab.elpissender.usecase.SensingUsecase
 
 class SensingService : Service() {
     val sensingUsecase = SensingUsecase(this)
-    val searedPreferenceApi = SearedPreferenceApi()
+    val sharedPreferenceApi = SharedPreferenceApi()
     private val serviceScope = CoroutineScope(Dispatchers.IO)
 
     override fun onStartCommand(
@@ -27,7 +27,7 @@ class SensingService : Service() {
         flags: Int,
         startId: Int,
     ): Int {
-        searedPreferenceApi.setBooleanValueByKey("isSensing", true, this)
+        sharedPreferenceApi.setBooleanValueByKey("isSensing", true, this)
         startForeground()
         serviceScope.launch {
             sensingUsecase.firstStart()
@@ -36,7 +36,7 @@ class SensingService : Service() {
     }
 
     override fun onDestroy() {
-        searedPreferenceApi.setBooleanValueByKey("isSensing", false, this)
+        sharedPreferenceApi.setBooleanValueByKey("isSensing", false, this)
         sensingUsecase.finalStop()
         super.onDestroy()
     }

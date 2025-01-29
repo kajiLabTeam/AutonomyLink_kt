@@ -8,7 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import net.kajilab.elpissender.api.SearedPreferenceApi
+import net.kajilab.elpissender.api.SharedPreferenceApi
 import net.kajilab.elpissender.api.http.ApiResponse
 import net.kajilab.elpissender.repository.UserRepository
 import net.kajilab.elpissender.usecase.SensingUsecase
@@ -17,7 +17,7 @@ class SettingViewModel : ViewModel() {
     var sensingTime by mutableIntStateOf(0) // センシング中の時間
     var waitTime by mutableIntStateOf(0) // センシング待機時間
 
-    val searedPreferenceApi = SearedPreferenceApi()
+    val sharedPreferenceApi = SharedPreferenceApi()
     var sensingUsecase: SensingUsecase? = null
     var apiResponse: ApiResponse? = null
     val userRepository = UserRepository()
@@ -29,13 +29,13 @@ class SettingViewModel : ViewModel() {
 
     fun getSensingTime(context: Context) {
         sensingTime =
-            searedPreferenceApi.getIntegerValueByKey(
+            sharedPreferenceApi.getIntegerValueByKey(
                 key = "sensingTime",
                 context = context,
                 defaultValue = 5,
             )
         waitTime =
-            searedPreferenceApi.getIntegerValueByKey(
+            sharedPreferenceApi.getIntegerValueByKey(
                 key = "waitTime",
                 context = context,
                 defaultValue = 10,
@@ -43,8 +43,8 @@ class SettingViewModel : ViewModel() {
     }
 
     fun setSensingTime(context: Context) {
-        searedPreferenceApi.setIntegerValueByKey("sensingTime", sensingTime, context)
-        searedPreferenceApi.setIntegerValueByKey("waitTime", waitTime, context)
+        sharedPreferenceApi.setIntegerValueByKey("sensingTime", sensingTime, context)
+        sharedPreferenceApi.setIntegerValueByKey("waitTime", waitTime, context)
     }
 
     fun getSetting(context: Context) {

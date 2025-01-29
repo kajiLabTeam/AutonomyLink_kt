@@ -1,14 +1,11 @@
 package net.kajilab.elpissender.repository
 
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
-import net.kajilab.elpissender.api.SearedPreferenceApi
+import net.kajilab.elpissender.api.SharedPreferenceApi
 import net.kajilab.elpissender.entity.User
 
 class UserRepository {
-    val searedPreferenceApi = SearedPreferenceApi()
+    val sharedPreferenceApi = SharedPreferenceApi()
 
     companion object {
         private const val KEY_USER_NAME = "userName"
@@ -17,36 +14,36 @@ class UserRepository {
     }
 
     fun getUserName(context: Context): String {
-        return searedPreferenceApi.getStringValueByKey(KEY_USER_NAME, context)
+        return sharedPreferenceApi.getStringValueByKey(KEY_USER_NAME, context)
     }
 
     fun getPassword(context: Context): String {
-        return searedPreferenceApi.getSecureStringValueByKey(KEY_PASSWORD,context)
+        return sharedPreferenceApi.getSecureStringValueByKey(KEY_PASSWORD,context)
     }
 
     fun getServerUrl(context: Context): String {
-        return searedPreferenceApi.getStringValueByKey(KEY_SERVER_URL, context)
+        return sharedPreferenceApi.getStringValueByKey(KEY_SERVER_URL, context)
     }
 
     fun updateUserName(
         name: String,
         context: Context,
     ) {
-        searedPreferenceApi.setStringValueByKey(KEY_USER_NAME, name, context)
+        sharedPreferenceApi.setStringValueByKey(KEY_USER_NAME, name, context)
     }
 
     fun updatePassword(
         password: String,
         context: Context,
     ) {
-        searedPreferenceApi.setSecureStringValueByKey(KEY_PASSWORD, password, context)
+        sharedPreferenceApi.setSecureStringValueByKey(KEY_PASSWORD, password, context)
     }
 
     fun updateServerUrl(
         url: String,
         context: Context,
     ) {
-        searedPreferenceApi.setStringValueByKey(KEY_SERVER_URL, url, context)
+        sharedPreferenceApi.setStringValueByKey(KEY_SERVER_URL, url, context)
     }
 
     fun saveUserSetting(

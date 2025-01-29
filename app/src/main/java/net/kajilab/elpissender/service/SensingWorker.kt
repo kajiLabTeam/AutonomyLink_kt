@@ -14,7 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.kajilab.elpissender.R
-import net.kajilab.elpissender.api.SearedPreferenceApi
+import net.kajilab.elpissender.api.SharedPreferenceApi
 import net.kajilab.elpissender.repository.LogSendRepository
 import net.kajilab.elpissender.usecase.SensingUsecase
 
@@ -29,7 +29,7 @@ class SensingWorker(
     private val notificationId = 1
 
     private val sensingUsecase = SensingUsecase(context)
-    private val searedPreferenceApi = SearedPreferenceApi()
+    private val sharedPreferenceApi = SharedPreferenceApi()
     private val serviceScope = CoroutineScope(Dispatchers.IO)
     private val logSendRepository = LogSendRepository()
 
@@ -41,7 +41,7 @@ class SensingWorker(
     }
 
     override suspend fun doWork(): Result {
-        searedPreferenceApi.setBooleanValueByKey("isSensing", true, context)
+        sharedPreferenceApi.setBooleanValueByKey("isSensing", true, context)
         serviceScope.launch {
             logSendRepository.sendLog("start", "センシングを開始しました", 1)
             sensingUsecase.timerStart(

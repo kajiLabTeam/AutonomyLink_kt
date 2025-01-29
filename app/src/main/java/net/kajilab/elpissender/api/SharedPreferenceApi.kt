@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
-class SearedPreferenceApi {
+class SharedPreferenceApi {
     private val preferenceFileKey = "SearedPreference"
 
     private lateinit var encryptedPrefs: SharedPreferences

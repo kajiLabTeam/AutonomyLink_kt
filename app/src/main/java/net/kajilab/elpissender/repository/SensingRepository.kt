@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.File
@@ -45,6 +46,8 @@ class SensingRepository(context: Context) {
         }
     }
 
+    private val compositeDisposable = CompositeDisposable()
+
     fun sensorStop(
         sensors: MutableList<SensorBase>,
         onStopped: (List<File?>) -> Unit,
@@ -54,7 +57,7 @@ class SensingRepository(context: Context) {
                 sensor.stop() // This should return Single<File?>
             }
 
-        val disposable: Disposable =
+        compositeDisposable.add(
             Single.zip(singles) { results ->
                 results.map { it as File? }
             }
@@ -70,5 +73,10 @@ class SensingRepository(context: Context) {
                         Log.e(tag, "センサー停止 失敗", e)
                     },
                 )
+        )
+    }
+
+    fun onCleared() {
+        compositeDisposable.clear()
     }
 }

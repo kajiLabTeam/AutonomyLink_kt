@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import net.kajilab.elpissender.api.SearedPreferenceApi
+import net.kajilab.elpissender.api.SharedPreferenceApi
 import net.kajilab.elpissender.entity.User
 import net.kajilab.elpissender.repository.UserRepository
 import net.kajilab.elpissender.service.SensingWorker
@@ -22,7 +22,7 @@ class UserViewModel : ViewModel() {
     var isSensing by mutableStateOf(false)
 
     val userRepository = UserRepository()
-    val searedPreferenceApi = SearedPreferenceApi()
+    val sharedPreferenceApi = SharedPreferenceApi()
 
     fun saveUserSetting(
         context: Context,
