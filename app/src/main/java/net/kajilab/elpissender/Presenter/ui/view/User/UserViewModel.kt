@@ -85,8 +85,8 @@ class UserViewModel: ViewModel() {
             val wokManager = WorkManager.getInstance(context)
             val sensingWorkerRequest = PeriodicWorkRequest.Builder(
                 SensingWorker::class.java,
-                20, TimeUnit.MINUTES, // インターバルの時間
-                10, TimeUnit.MINUTES  // フレックスの時間
+                15, TimeUnit.MINUTES, // インターバルの時間
+                5, TimeUnit.MINUTES  // フレックスの時間
             )
                 .apply {
                     addTag(SensingWorker.WorkerTag)
